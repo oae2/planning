@@ -222,7 +222,12 @@
 
       // If ultra-short fails, use regular APIs
       const regularAPIs = [
-
+        {
+          name: "TinyURL",
+          url: `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`,
+          method: "GET",
+          parser: (response) => response.text()
+        },
         {
           name: "is.gd", 
           url: `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
