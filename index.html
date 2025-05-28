@@ -125,52 +125,27 @@
 
 	<script>
   async function shortenURL() {
-  const longUrl = document.getElementById("longUrl").value.trim();
-  if (!longUrl || !longUrl.startsWith("http")) {
-    alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://...");
-    return;
-  }
-
-  const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
-
-  try {
-    const res = await fetch(apiUrl);
-    if (!res.ok) throw new Error("Network error");
-    const shortLink = await res.text();
-
-    document.getElementById("shortLink").value = shortLink;
-    document.getElementById("shortResult").classList.remove("hidden");
-  } catch (err) {
-    alert("เกิดข้อผิดพลาดขณะติดต่อ API (is.gd)");
-  }
-}
-
-
-  function copyShortLink() {
-    const shortLink = document.getElementById("shortLink");
-    shortLink.select();
-    shortLink.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("คัดลอกลิงก์สั้นแล้ว!");
-  }
-
-  // แสดง/ซ่อน Section ตาม #hash
-  window.addEventListener("hashchange", () => {
-    const section = location.hash.slice(1);
-    document.querySelectorAll("section").forEach(el => el.classList.add("hidden"));
-    if (section) {
-      document.getElementById(section)?.classList.remove("hidden");
+    const longUrl = document.getElementById("longUrl").value.trim();
+    if (!longUrl || !longUrl.startsWith("http")) {
+      alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://...");
+      return;
     }
-  });
 
-  // เปิด Section ตาม URL hash ตอนโหลด
-  window.addEventListener("DOMContentLoaded", () => {
-    const section = location.hash.slice(1);
-    if (section) {
-      document.getElementById(section)?.classList.remove("hidden");
+    try {
+      const res = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(longUrl)}`);
+      const data = await res.json();
+
+      if (!data.ok) throw new Error(data.error);
+
+      const shortLink = data.result.full_short_link;
+      document.getElementById("shortLink").value = shortLink;
+      document.getElementById("shortResult").classList.remove("hidden");
+    } catch (err) {
+      alert("เกิดข้อผิดพลาด: " + err.message);
     }
-  });
+  }
 </script>
+
 
 </body>
 </html>
