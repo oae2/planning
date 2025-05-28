@@ -214,7 +214,7 @@
       const regularAPIs = [
         {
           name: "is.gd", 
-          url: `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
+          url: `https://is.gd/create.php?format=simple&url=www.example.com.{encodeURIComponent(longUrl)}`,
           method: "GET",
           parser: (response) => response.text()
         }
