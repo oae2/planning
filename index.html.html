@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>OAE QR Genrate (Advance)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+</head>
+<body class="flex bg-gray-100 h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md p-4 hidden md:block">
+    <div class="text-xl font-bold mb-4 text-blue-600">OAE QR Genrate</div>
+    <nav class="space-y-3">
+      <a href="#" class="block px-3 py-2 rounded bg-blue-100 text-blue-700 font-medium">QR Code Generator</a>
+      <a href="#shorturl" class="block px-3 py-2 rounded hover:bg-gray-200">Short URL</a>
+      <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">PDF Tools</a>
+      <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">ตั้งค่า</a>
+	  
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-auto">
+    <h1 class="text-2xl font-bold text-blue-700 mb-6">สร้าง QR Code (ปรับแต่งได้)</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+      <label class="block mb-2 font-semibold">ข้อความหรือ URL:</label>
+      <input id="qrText" type="text" class="w-full p-2 border rounded mb-4" placeholder="ใส่ข้อความ หรือ URL">
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block mb-1 font-semibold">ขนาด:</label>
+          <select id="qrSize" class="w-full p-2 border rounded">
+            <option value="200">200 x 200</option>
+            <option value="300" selected>300 x 300</option>
+            <option value="400">400 x 400</option>
+          </select>
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">สีจุด (Foreground):</label>
+          <input type="color" id="qrColor" value="#000000" class="w-full h-[38px] border rounded">
+        </div>
+      </div>
+
+      <label class="block mb-1 font-semibold">ลักษณะของ QR:</label>
+      <select id="qrStyle" class="w-full p-2 border rounded mb-4">
+        <option value="square">มาตรฐาน (Square)</option>
+        <option value="dots">จุด (Dots)</option>
+        <option value="rounded">มุมมน (Rounded)</option>
+        <option value="classy">สวยหรู (Classy)</option>
+        <option value="classy-rounded">Classy + Rounded</option>
+        <option value="extra-rounded">Extra Rounded</option>
+      </select>
+
+      <button onclick="generateQR()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">สร้าง QR</button>
+
+      <div id="qrContainer" class="mt-6 text-center"></div>
+      <div class="text-center mt-4 hidden" id="downloadBtn">
+        <button onclick="downloadQR()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">ดาวน์โหลด</button>
+      </div>
+    </div>
+	
+	<section id="shorturl" class="bg-white p-6 mt-10 rounded-lg shadow-md max-w-2xl mx-auto hidden">
+  <h2 class="text-xl font-bold mb-4 text-blue-700">ย่อ URL (Short URL)</h2>
+  
+  <label class="block mb-2 font-semibold">กรอกลิงก์ยาว (Long URL):</label>
+  <input id="longUrl" type="text" class="w-full p-2 border rounded mb-4" placeholder="https://example.com/very/long/link">
+
+  <button onclick="shortenURL()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">สร้างลิงก์สั้น</button>
+
+  <div id="shortResult" class="mt-4 text-center hidden">
+    <p class="mb-2">ลิงก์สั้นของคุณ:</p>
+    <input id="shortLink" class="p-2 border rounded w-full text-center text-blue-700 font-semibold" readonly>
+    <button onclick="copyShortLink()" class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">คัดลอก</button>
+  </div>
+</section>
+
+  </main>
+
+  <script>
+    let qr = null;
+
+    function generateQR() {
+      const text = document.getElementById("qrText").value.trim();
+      const size = parseInt(document.getElementById("qrSize").value);
+      const color = document.getElementById("qrColor").value;
+      const style = document.getElementById("qrStyle").value;
+
+      if (!text) return alert("กรุณากรอกข้อความก่อน");
+
+      if (qr) {
+        document.getElementById("qrContainer").innerHTML = ""; // reset
+      }
+
+      qr = new QRCodeStyling({
+        width: size,
+        height: size,
+        data: text,
+        dotsOptions: {
+          color: color,
+          type: style
+        },
+        backgroundOptions: {
+          color: "#ffffff"
+        },
+        imageOptions: {
+          crossOrigin: "anonymous",
+          margin: 5
+        }
+      });
+
+      qr.append(document.getElementById("qrContainer"));
+      document.getElementById("downloadBtn").classList.remove("hidden");
+    }
+
+    function downloadQR() {
+      if (qr) {
+        qr.download({ name: "qr-code", extension: "png" });
+      }
+    }
+  </script>
+
+
+	<script>
+  async function shortenURL() {
+  const longUrl = document.getElementById("longUrl").value.trim();
+  if (!longUrl || !longUrl.startsWith("http")) {
+    alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://...");
+    return;
+  }
+
+  const apiUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`;
+
+  try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error("Network error");
+    const shortLink = await res.text();
+
+    document.getElementById("shortLink").value = shortLink;
+    document.getElementById("shortResult").classList.remove("hidden");
+  } catch (err) {
+    alert("เกิดข้อผิดพลาดขณะติดต่อ API (is.gd)");
+  }
+}
+
+
+  function copyShortLink() {
+    const shortLink = document.getElementById("shortLink");
+    shortLink.select();
+    shortLink.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("คัดลอกลิงก์สั้นแล้ว!");
+  }
+
+  // แสดง/ซ่อน Section ตาม #hash
+  window.addEventListener("hashchange", () => {
+    const section = location.hash.slice(1);
+    document.querySelectorAll("section").forEach(el => el.classList.add("hidden"));
+    if (section) {
+      document.getElementById(section)?.classList.remove("hidden");
+    }
+  });
+
+  // เปิด Section ตาม URL hash ตอนโหลด
+  window.addEventListener("DOMContentLoaded", () => {
+    const section = location.hash.slice(1);
+    if (section) {
+      document.getElementById(section)?.classList.remove("hidden");
+    }
+  });
+</script>
+
+</body>
+</html>
