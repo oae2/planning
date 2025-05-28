@@ -282,7 +282,7 @@
         // Fallback to simulated custom short URL
       }
       
-      return `https://s.ly/${customCode}`;
+      return `https://t.ly/${customCode}`;
     }
 
     async function createReadableShortURL(longUrl) {
@@ -324,7 +324,7 @@
         short += chars[hash.charCodeAt(i) % chars.length];
       }
       
-      return `s.ly/${short}`; // Total: 8 characters including domain
+      return `t.ly/${short}`; // Total: 8 characters including domain
     }
 
     function generateQRFromShort() {
