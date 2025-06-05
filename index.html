@@ -11,16 +11,22 @@
 </head>
 <body class="flex bg-gray-100 h-screen">
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-white shadow-md p-4 hidden md:block">
-    <div class="text-xl font-bold mb-4 text-blue-600">OAE QR Generate</div>
-    <nav class="space-y-3">
-      <a href="#qr" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">QR Code Generator</a>
-      <a href="#shorturl" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">Short URL</a>
-      <a href="#pdftools" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">PDF Tools</a>
-      <a href="#settings" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">ตั้งค่า</a>
-    </nav>
-  </aside>
+	<!-- ปุ่ม Hamburger สำหรับมือถือ -->
+<button id="mobileMenuBtn" class="fixed top-4 left-4 z-50 md:hidden bg-blue-600 text-white p-2 rounded shadow-lg">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+
+  <!-- Sidebar (แก้ไขใหม่ รองรับ mobile) -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-md p-4 z-40 transform -translate-x-full transition-transform duration-200 md:relative md:translate-x-0 md:block">
+  <div class="text-xl font-bold mb-4 text-blue-600">OAE QR Generate</div>
+  <nav class="space-y-3">
+    <a href="#qr" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">QR Code Generator</a>
+    <a href="#shorturl" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">Short URL</a>
+    <a href="#pdftools" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">PDF Tools</a>
+    <a href="#settings" class="nav-link block px-3 py-2 rounded hover:bg-gray-200">ตั้งค่า</a>
+  </nav>
+</aside>
+
 
   <!-- Main Content -->
   <main class="flex-1 p-6 overflow-auto">
@@ -500,6 +506,40 @@
         
         qr.append(document.getElementById("qrContainer"));
         document.getElementById("downloadBtn").classList.remove("hidden");
+
+// ใส่กรอบกล่องรอบ QR Code แบบ OAE
+    setTimeout(() => {
+      const qrEl = document.getElementById("qrContainer").firstElementChild;
+      if (qrEl) {
+        // สร้างกรอบแบบ OAE
+        const oaeFrame = document.createElement("div");
+        oaeFrame.className = "inline-block bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200";
+        
+        // ส่วนหัว (Header) - สีเขียวอ่อน
+        const header = document.createElement("div");
+        header.className = "bg-[#c8e6c9] px-6 py-3 text-center";
+        header.innerHTML = '<div class="text-[#2e7d32] font-bold text-lg tracking-wider">OAE QR CODE</div>';
+        
+        // ส่วนกลาง (Body) - พื้นหลังสีขาวสำหรับ QR Code
+        const body = document.createElement("div");
+        body.className = "bg-white p-8 flex justify-center items-center";
+        body.appendChild(qrEl);
+        
+        // ส่วนท้าย (Footer) - สีเขียวเข้ม
+        const footer = document.createElement("div");
+        footer.className = "bg-[#1b5e20] px-6 py-4 text-center";
+        footer.innerHTML = '<div class="text-white font-medium text-sm">สำนักงานเศรษฐกิจการเกษตร</div>';
+        
+        // รวมทุกส่วนเข้าด้วยกัน
+        oaeFrame.appendChild(header);
+        oaeFrame.appendChild(body);
+        oaeFrame.appendChild(footer);
+        
+        // แทนที่ QR Code เดิมด้วยกรอบใหม่
+        document.getElementById("qrContainer").innerHTML = "";
+        document.getElementById("qrContainer").appendChild(oaeFrame);
+      }
+    }, 100);
         
         console.log("QR Code generated successfully");
       } catch (error) {
@@ -1327,6 +1367,36 @@
 
     console.log('Script loaded successfully');
   </script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Hamburger menu & sidebar toggle
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const sidebar = document.getElementById("sidebar");
+
+  if (mobileMenuBtn && sidebar) {
+    // เปิด/ปิด sidebar
+    mobileMenuBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      sidebar.classList.toggle("-translate-x-full");
+    });
+
+    // ปิด sidebar เมื่อคลิกที่อื่น (เฉพาะบนมือถือ)
+    document.addEventListener("click", function (e) {
+      if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target) && window.innerWidth < 768) {
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
+
+    // ถ้าเปลี่ยนขนาดจอ (เช่น หมุนมือถือแนวนอน) ให้ปิด sidebar อัตโนมัติถ้าจอกลับไปเล็ก
+    window.addEventListener("resize", function () {
+      if (window.innerWidth < 768) {
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
+  }
+});
+</script>
 
 </body>
 </html>
