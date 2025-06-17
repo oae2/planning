@@ -12,6 +12,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sarabun:400,700|Prompt:400,700|Kanit:400,700|Mitr:400,700|Maitree:400,700|Pridi:400,700|Sriracha|Srisakdi:400,700|Taviraj:400,700|Niramit:400,700|Chonburi|Charmonman:400,700|Charm|Pattaya|Bai+Jamjuree:400,700|Mali:400,700|Sura:400,700|Noto+Sans+Thai:400,700|Noto+Serif+Thai:400,700|Arial:400,700|Times+New+Roman:400,700|Helvetica:400,700|Courier+New:400,700|Georgia:400,700|Verdana:400,700|Trebuchet+MS:400,700|Comic+Sans+MS:400,700|Impact:400,700|Lucida+Console:400,700&display=swap">
   <style>
+
+     <!-- Security Protection CSS -->
+  <style>
+    /* ป้องกันการเลือกข้อความ (เฉพาะส่วนที่ไม่จำเป็น) */
+    .no-select {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* อนุญาตการเลือกในช่อง input และ textarea */
+    input, textarea, [contenteditable="true"], button {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    
+    /* ป้องกันการ drag & drop ภาพ */
+    img {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+    }
+ <!-- Security Protection CSS -->
+    
     .tool-card {
       transition: all 0.3s ease;
       cursor: pointer;
@@ -984,6 +1015,152 @@
 
   </main>
 
+
+  <!-- Security Protection Scripts -->
+  <script>
+    (function() {
+      'use strict';
+
+      // แสดงข้อความแจ้งเตือนความปลอดภัย
+      function showSecurityAlert(message = 'การกระทำนี้ไม่ได้รับอนุญาต!') {
+        // สร้าง popup แจ้งเตือน
+        const alertDiv = document.createElement('div');
+        alertDiv.innerHTML = `
+          <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+          ">
+            <div style="
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+              text-align: center;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+              max-width: 400px;
+            ">
+              <div style="color: #dc2626; font-size: 60px; margin-bottom: 20px;">🚫</div>
+              <h2 style="color: #dc2626; margin: 0 0 15px 0;">ข้อความแจ้งเตือน</h2>
+              <p style="color: #374151; margin: 0 0 20px 0; line-height: 1.5;">${message}</p>
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">
+                เว็บไซต์นี้ได้รับการป้องกันเพื่อความปลอดภัยของข้อมูล
+              </p>
+              <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
+                background: #dc2626;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+              ">ตกลง</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(alertDiv);
+
+        // ลบแจ้งเตือนอัตโนมัติหลัง 3 วินาที
+        setTimeout(() => {
+          if (alertDiv.parentElement) {
+            alertDiv.remove();
+          }
+        }, 3000);
+      }
+
+      // ป้องกันการคลิกขวา (แต่ไม่ขัดขวางการทำงานปกติ)
+      document.addEventListener('contextmenu', function(e) {
+        // ยกเว้นใน input และ textarea เพื่อให้ใช้เมนูคลิกขวาได้
+        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+          showSecurityAlert('การคลิกขวาไม่ได้รับอนุญาต');
+        }
+      });
+
+      // ป้องกันปุ่มลัดบางส่วน (แต่ไม่เข้มงวดเกินไป)
+      document.addEventListener('keydown', function(e) {
+        // F12 - Developer Tools
+        if (e.keyCode === 123) {
+          e.preventDefault();
+          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
+          return false;
+        }
+        
+        // Ctrl+Shift+I (Developer Tools)
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+          e.preventDefault();
+          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
+          return false;
+        }
+        
+        // Ctrl+U (View Source)
+        if (e.ctrlKey && e.keyCode === 85) {
+          e.preventDefault();
+          showSecurityAlert('การดูซอร์สโค้ดไม่ได้รับอนุญาต');
+          return false;
+        }
+        
+        // Ctrl+S (Save Page) - ยกเว้นเมื่ออยู่ใน input/textarea
+        if (e.ctrlKey && e.keyCode === 83 && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+          showSecurityAlert('การบันทึกหน้าเว็บไม่ได้รับอนุญาต');
+          return false;
+        }
+      });
+
+      // ป้องกันการเลือกข้อความ (ยกเว้นใน input/textarea และ element ที่จำเป็น)
+      document.addEventListener('selectstart', function(e) {
+        if (!['INPUT', 'TEXTAREA', 'BUTTON'].includes(e.target.tagName) && 
+            !e.target.closest('[contenteditable]') &&
+            !e.target.closest('.allow-select')) {
+          e.preventDefault();
+          return false;
+        }
+      });
+
+      // ป้องกันการลากเฉพาะรูปภาพ
+      document.addEventListener('dragstart', function(e) {
+        if (e.target.tagName === 'IMG') {
+          e.preventDefault();
+          return false;
+        }
+      });
+
+      // ป้องกันการ print ด้วย CSS media query
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = `
+        @media print {
+          body { display: none !important; }
+          body::before { 
+            content: "การพิมพ์เอกสารนี้ไม่ได้รับอนุญาต"; 
+            font-size: 20px; 
+            color: red; 
+            display: block; 
+            text-align: center; 
+            margin-top: 50px; 
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // ทำให้ window.showSecurityAlert สามารถเรียกใช้ได้จากภายนอก (สำหรับ debugging)
+      window.showSecurityAlert = showSecurityAlert;
+
+      console.log('🔒 Security protection activated (lite version)');
+
+    })();
+  </script>
+
+
+  
   <!-- JavaScript -->
   <script>
     // Global Variables
