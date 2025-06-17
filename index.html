@@ -178,34 +178,31 @@
     <section id="pdftools" class="content-section hidden">
       <h1 class="text-2xl font-bold text-blue-700 mb-6">เครื่องมือ PDF (PDF Tools)</h1>
       
-      <!-- PDF Tool Selection -->
-      <div class="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button onclick="showPdfTool('merge')" class="pdf-tool-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" data-tool="merge">
-            <div class="text-3xl mb-2">📄</div>
-            <h3 class="font-semibold">รวม PDF</h3>
-            <p class="text-sm text-gray-600">รวมหลายไฟล์ PDF เป็นไฟล์เดียว</p>
-          </button>
-          
-          <button onclick="showPdfTool('split')" class="pdf-tool-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" data-tool="split">
-            <div class="text-3xl mb-2">✂️</div>
-            <h3 class="font-semibold">แยก PDF</h3>
-            <p class="text-sm text-gray-600">แยกหน้า PDF เป็นไฟล์แยกต่างหาก</p>
-          </button>
-          
-          <button onclick="showPdfTool('compress')" class="pdf-tool-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" data-tool="compress">
-            <div class="text-3xl mb-2">🗜️</div>
-            <h3 class="font-semibold">บีบอัด PDF</h3>
-            <p class="text-sm text-gray-600">ลดขนาดไฟล์ PDF</p>
-          </button>
-          
-          <button onclick="showPdfTool('convert')" class="pdf-tool-btn p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" data-tool="convert">
-            <div class="text-3xl mb-2">🔄</div>
-            <h3 class="font-semibold">แปลงไฟล์</h3>
-            <p class="text-sm text-gray-600">แปลง PDF ↔ รูปภาพ, Word</p>
-          </button>
-        </div>
-      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <a href="pdf tool.html" class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+    <div class="text-3xl mb-2">📄</div>
+    <h3 class="font-semibold">รวม PDF</h3>
+    <p class="text-sm text-gray-600">รวมหลายไฟล์ PDF เป็นไฟล์เดียว</p>
+  </a>
+
+  <a href="pdf tool.html" class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+    <div class="text-3xl mb-2">✂️</div>
+    <h3 class="font-semibold">แยก PDF</h3>
+    <p class="text-sm text-gray-600">แยกหน้า PDF เป็นไฟล์แยกต่างหาก</p>
+  </a>
+
+  <a href="pdf tool.html" class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+    <div class="text-3xl mb-2">🗜️</div>
+    <h3 class="font-semibold">บีบอัด PDF</h3>
+    <p class="text-sm text-gray-600">ลดขนาดไฟล์ PDF</p>
+  </a>
+
+  <a href="pdf tool.html" class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+    <div class="text-3xl mb-2">🔄</div>
+    <h3 class="font-semibold">แปลงไฟล์</h3>
+    <p class="text-sm text-gray-600">แปลง PDF ↔ รูปภาพ, Word</p>
+  </a>
+</div>
 
       <!-- PDF Merge Tool -->
       <div id="pdf-merge" class="pdf-tool hidden">
