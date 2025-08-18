@@ -3728,7 +3728,9 @@
         console.log('Tool opened successfully:', toolName);
         
         // Initialize specific tools
-        if (toolName === 'sign') {
+        if (toolName === 'edit') {
+          initializeEditTool(); 
+        } else if (toolName === 'sign') {
           initializeSignTool();
         } else if (toolName === 'watermark') {
           initializeWatermarkTool();
@@ -5156,5 +5158,6 @@
   </script>
 </body>
 </html>
+
 
 
