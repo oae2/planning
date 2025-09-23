@@ -1794,150 +1794,360 @@
       </div>
     </section>
 
+  
+    <!-- JPG to PDF Tool -->
+    <section id="jpg-to-pdf-tool" class="hidden">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">🖼️→📄 JPG to PDF</h2>
+          <p class="text-gray-600">แปลงรูปภาพ JPG หลายไฟล์ให้เป็นไฟล์ PDF เดียว พร้อมตัวเลือกขนาดกระดาษ ขอบหน้า และการวางภาพ</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Main area -->
+          <div class="lg:col-span-3">
+            <!-- Drop zone -->
+            <div id="jpg2pdf-drop-zone" class="file-drop-zone border-2 border-dashed border-gray-300 rounded-lg p-12 text-center mb-6 cursor-pointer">
+              <div class="animate-bounce-gentle mb-4">
+                <div class="text-6xl text-gray-400">🖼️</div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-700 mb-2">ลากรูป JPG/JPEG มาวาง หรือคลิกเพื่อเลือก</h3>
+              <p class="text-gray-500 mb-4">รองรับหลายไฟล์ • สามารถจัดเรียงลำดับได้</p>
+              <input type="file" id="jpg2pdf-files" accept="image/*,.jpg,.jpeg,.png,.webp" multiple class="hidden">
+              <button id="jpg2pdf-select-btn" jpg2pdf-files').click()" class="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition-all">
+                เลือกรูปภาพ
+              </button>
+            </div>
+
+            <!-- Files grid -->
+            <div id="jpg2pdf-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6"></div>
+
+            <!-- Progress -->
+            <div id="jpg2pdf-progress" class="hidden mb-6">
+              <div class="bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div id="jpg2pdf-progress-bar" class="progress-bar bg-yellow-600 h-full" style="width: 0%"></div>
+              </div>
+              <p class="text-center text-sm text-gray-600 mt-2">กำลังประมวลผล... <span id="jpg2pdf-progress-text">0%</span></p>
+            </div>
+
+            <!-- Result -->
+            <div id="jpg2pdf-result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-green-800 mb-2">✅ สร้าง PDF สำเร็จ!</h3>
+              <p class="text-green-700 mb-4">ดาวน์โหลดไฟล์ที่ได้ด้านล่าง</p>
+              <a id="jpg2pdf-download" class="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700" download="images-to-pdf.pdf">📥 ดาวน์โหลด PDF</a>
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div class="lg:col-span-1">
+            <div class="control-panel">
+              <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">ตัวเลือก</h3>
+              
+              <label class="block text-sm font-medium text-gray-700 mb-1">ขนาดกระดาษ</label>
+              <select id="jpg2pdf-page-size" class="w-full p-2 border rounded mb-3">
+                <option value="a4">A4 (210×297 mm)</option>
+                <option value="letter">Letter (8.5×11 in)</option>
+                <option value="legal">Legal (8.5×14 in)</option>
+                <option value="fit-image">ปรับตามขนาดรูป (ต่อหน้า)</option>
+              </select>
+
+              <label class="block text-sm font-medium text-gray-700 mb-1">การวางรูป</label>
+              <select id="jpg2pdf-fit" class="w-full p-2 border rounded mb-3">
+                <option value="contain">Contain (พอดีกรอบ)</option>
+                <option value="cover">Cover (เต็มกรอบ อาจครอป)</option>
+                <option value="stretch">ยืดเต็มกรอบ</option>
+                <option value="actual">Actual size (ตาม DPI)</option>
+              </select>
+
+              <label class="block text-sm font-medium text-gray-700 mb-1">ระยะขอบ (มม.)</label>
+              <input id="jpg2pdf-margin" type="number" min="0" value="10" class="w-full p-2 border rounded mb-3">
+
+              <label class="block text-sm font-medium text-gray-700 mb-1">แนวกระดาษ</label>
+              <select id="jpg2pdf-orientation" class="w-full p-2 border rounded mb-3">
+                <option value="auto">อัตโนมัติ</option>
+                <option value="p">แนวตั้ง</option>
+                <option value="l">แนวนอน</option>
+              </select>
+
+              <label class="block text-sm font-medium text-gray-700 mb-1">DPI (สำหรับ Actual size)</label>
+              <input id="jpg2pdf-dpi" type="number" min="72" max="600" value="150" class="w-full p-2 border rounded mb-4">
+
+              <button id="jpg2pdf-generate" class="w-full bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                ➜ สร้าง PDF
+              </button>
+              <p id="jpg2pdf-hint" class="text-xs text-gray-500 mt-2">เพิ่มรูปอย่างน้อย 1 รูปเพื่อเปิดใช้งานปุ่ม</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
   </main>
 
    <!-- Security Protection Scripts -->
   <script>
-    (function() {
-      'use strict';
+// ===== JPG to PDF (clean) =====
+(function(){
+  const listEl = document.getElementById('jpg2pdf-list');
+  const dropZone = document.getElementById('jpg2pdf-drop-zone');
+  const input = document.getElementById('jpg2pdf-files');
+  const btn = document.getElementById('jpg2pdf-generate');
+  const pageSizeSel = document.getElementById('jpg2pdf-page-size');
+  const fitSel = document.getElementById('jpg2pdf-fit');
+  const marginInput = document.getElementById('jpg2pdf-margin');
+  const orientSel = document.getElementById('jpg2pdf-orientation');
+  const dpiInput = document.getElementById('jpg2pdf-dpi');
+  const progress = document.getElementById('jpg2pdf-progress');
+  const progressBar = document.getElementById('jpg2pdf-progress-bar');
+  const progressText = document.getElementById('jpg2pdf-progress-text');
+  const result = document.getElementById('jpg2pdf-result');
+  const downloadA = document.getElementById('jpg2pdf-download');
 
-      // แสดงข้อความแจ้งเตือนความปลอดภัย
-      function showSecurityAlert(message = 'การกระทำนี้ไม่ได้รับอนุญาต!') {
-        // สร้าง popup แจ้งเตือน
-        const alertDiv = document.createElement('div');
-        alertDiv.innerHTML = `
-          <div style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-          ">
-            <div style="
-              background: white;
-              padding: 30px;
-              border-radius: 10px;
-              text-align: center;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-              max-width: 400px;
-            ">
-              <div style="color: #dc2626; font-size: 60px; margin-bottom: 20px;">🚫</div>
-              <h2 style="color: #dc2626; margin: 0 0 15px 0;">ข้อความแจ้งเตือน</h2>
-              <p style="color: #374151; margin: 0 0 20px 0; line-height: 1.5;">${message}</p>
-              <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">
-                เว็บไซต์นี้ได้รับการป้องกันเพื่อความปลอดภัยของข้อมูล
-              </p>
-              <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
-                background: #dc2626;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-              ">ตกลง</button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(alertDiv);
+  if(!dropZone || !input || !btn) return;
 
-        // ลบแจ้งเตือนอัตโนมัติหลัง 3 วินาที
-        setTimeout(() => {
-          if (alertDiv.parentElement) {
-            alertDiv.remove();
+  let items = []; // {name, type, dataURL, w, h}
+
+  function mm2pt(mm){ return mm * 72.0 / 25.4; }
+  function in2pt(_in){ return _in * 72.0; }
+
+  const presetSizes = {
+    'a4': [mm2pt(210), mm2pt(297)],
+    'letter': [in2pt(8.5), in2pt(11) ],
+    'legal': [in2pt(8.5), in2pt(14) ]
+  };
+
+  function enableGenerate(){ btn.disabled = items.length === 0; }
+
+  function renderList(){
+    if(!listEl) return;
+    listEl.innerHTML = "";
+    items.forEach((it, idx)=>{
+      const card = document.createElement('div');
+      card.className = "pdf-card relative";
+      card.setAttribute('draggable', 'true');
+      card.dataset.index = idx;
+
+      const thumb = document.createElement('div');
+      thumb.className = "pdf-thumbnail";
+      const img = document.createElement('img');
+      img.src = it.dataURL;
+      img.alt = it.name || ('image-'+(idx+1));
+      img.style.maxWidth = "100%";
+      img.style.maxHeight = "100%";
+      thumb.appendChild(img);
+
+      const num = document.createElement('div');
+      num.className = "page-number";
+      num.textContent = (idx+1);
+
+      const remove = document.createElement('div');
+      remove.className = "remove-btn";
+      remove.title = "ลบ";
+      remove.textContent = "✖";
+      remove.addEventListener('click', ()=>{
+        items.splice(idx,1);
+        renderList();
+        enableGenerate();
+      });
+
+      // drag handlers
+      card.addEventListener('dragstart', (e)=>{
+        e.dataTransfer.setData('text/plain', idx.toString());
+        card.classList.add('dragging');
+      });
+      card.addEventListener('dragend', ()=> card.classList.remove('dragging'));
+      card.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        card.classList.add('drag-over');
+      });
+      card.addEventListener('dragleave', ()=> card.classList.remove('drag-over'));
+      card.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const from = parseInt(e.dataTransfer.getData('text/plain'),10);
+        const to = idx;
+        if(!Number.isNaN(from) && from !== to){
+          const [moved] = items.splice(from,1);
+          items.splice(to,0,moved);
+          renderList();
+        }
+      });
+
+      card.appendChild(thumb);
+      card.appendChild(num);
+      card.appendChild(remove);
+      listEl.appendChild(card);
+    });
+  }
+
+  function readFiles(fileList){
+    const files = Array.from(fileList || []);
+    const imageFiles = files.filter(f => /^image\/(jpeg|jpg|png|webp)$/i.test(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name));
+    if(imageFiles.length === 0) return;
+    let pending = imageFiles.length;
+    imageFiles.forEach(f=>{
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const dataURL = ev.target.result;
+        const im = new Image();
+        im.onload = ()=>{
+          const dims = { w: im.naturalWidth || im.width, h: im.naturalHeight || im.height, el: im };
+          // Convert non-JPEG to JPEG via canvas (jsPDF prefers JPEG for size/perf)
+          let outDataURL = dataURL;
+          const mime = (f.type || '').toLowerCase();
+          if (!/image\/jpe?g/.test(mime)){
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, dims.w);
+            canvas.height = Math.max(1, dims.h);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(im, 0, 0);
+            outDataURL = canvas.toDataURL('image/jpeg', 0.92);
           }
-        }, 3000);
+          items.push({ name: f.name, type: 'image/jpeg', dataURL: outDataURL, w: dims.w, h: dims.h });
+          pending--;
+          if(pending===0){
+            renderList();
+            enableGenerate();
+          }
+        };
+        im.src = dataURL;
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  // Drop zone events
+  dropZone.addEventListener('click', (e)=>{ if(e.target === dropZone) input.click(); });
+  dropZone.addEventListener('dragover', (e)=>{ e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', ()=> dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', async (e)=>{ e.preventDefault(); dropZone.classList.remove('dragover'); const dt = e.dataTransfer; if(dt && dt.files){ const ok = (window.secureScanFiles ? await window.secureScanFiles(dt.files) : true); if(ok) readFiles(dt.files); } });
+  input.addEventListener('change', ()=> readFiles(input.files));
+
+  const selectBtn = document.getElementById('jpg2pdf-select-btn');
+  if(selectBtn){
+    selectBtn.addEventListener('click', (e)=>{ e.stopPropagation(); input.click(); });
+  }
+
+  function pxToPt(px, dpi){
+    // px -> inch = px/dpi -> pt = *72
+    return (px / dpi) * 72.0;
+  }
+
+  function computePlacement(availW, availH, imgWpt, imgHpt, fit){
+    let drawW = availW, drawH = availH;
+    const rImg = imgWpt / imgHpt;
+    const rBox = availW / availH;
+    if(fit === 'stretch'){
+      drawW = availW; drawH = availH;
+    }else if(fit === 'actual'){
+      drawW = Math.min(availW, imgWpt);
+      drawH = Math.min(availH, imgHpt);
+    }else if(fit === 'contain'){
+      if(rImg > rBox){ drawW = availW; drawH = availW / rImg; }
+      else { drawH = availH; drawW = availH * rImg; }
+    }else if(fit === 'cover'){
+      if(rImg > rBox){ drawH = availH; drawW = availH * rImg; }
+      else { drawW = availW; drawH = availW / rImg; }
+    }
+    const x = (availW - drawW)/2;
+    const y = (availH - drawH)/2;
+    return {x, y, w: drawW, h: drawH};
+  }
+
+  btn.addEventListener('click', async ()=>{
+    if(items.length === 0) return;
+
+    // Using jsPDF from window.jspdf
+    const { jsPDF } = window.jspdf || {};
+    if(!jsPDF){ alert('jsPDF not loaded'); return; }
+
+    const fit = fitSel ? fitSel.value : 'contain';
+    const ps = pageSizeSel ? pageSizeSel.value : 'a4';
+    const pageOrientation = orientSel ? orientSel.value : 'auto';
+    const marginPt = mm2pt(parseFloat(marginInput && marginInput.value ? marginInput.value : '10') || 0);
+    const dpi = parseFloat(dpiInput && dpiInput.value ? dpiInput.value : '150') || 150;
+
+    result.classList.add('hidden');
+    progress.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressText.textContent = '0%';
+
+    let doc = null;
+
+    for(let i=0;i<items.length;i++){
+      const it = items[i];
+      const imgWpt_actual = pxToPt(it.w, dpi);
+      const imgHpt_actual = pxToPt(it.h, dpi);
+
+      // Determine page size in points for this page
+      let pageW, pageH;
+      if(ps === 'fit-image'){
+        pageW = imgWpt_actual + marginPt*2;
+        pageH = imgHpt_actual + marginPt*2;
+        // orientation forced by dims unless overridden explicitly
+        if(!doc){
+          doc = new jsPDF({ unit:'pt', format:[pageW,pageH] });
+        }else{
+          doc.addPage([pageW,pageH]);
+        }
+      }else{
+        // preset fixed size
+        let baseW = presetSizes[ps][0], baseH = presetSizes[ps][1];
+        // apply orientation
+        let orient = pageOrientation;
+        if(orient === 'auto'){
+          // auto decide from image aspect ratio
+          orient = (it.w >= it.h) ? 'l' : 'p';
+        }
+        if(orient === 'l'){ [baseW, baseH] = [baseH, baseW]; }
+        pageW = baseW; pageH = baseH;
+        if(!doc){
+          doc = new jsPDF({ unit:'pt', format:[pageW,pageH] });
+        }else{
+          doc.addPage([pageW,pageH], (orient === 'l') ? 'landscape' : 'portrait');
+        }
       }
 
-      // ป้องกันการคลิกขวา (แต่ไม่ขัดขวางการทำงานปกติ)
-      document.addEventListener('contextmenu', function(e) {
-        // ยกเว้นใน input และ textarea เพื่อให้ใช้เมนูคลิกขวาได้
-        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-          e.preventDefault();
-          showSecurityAlert('การคลิกขวาไม่ได้รับอนุญาต');
-        }
-      });
+      // Available drawing area (content box)
+      const availW = Math.max(0, pageW - marginPt*2);
+      const availH = Math.max(0, pageH - marginPt*2);
 
-      // ป้องกันปุ่มลัดบางส่วน (แต่ไม่เข้มงวดเกินไป)
-      document.addEventListener('keydown', function(e) {
-        // F12 - Developer Tools
-        if (e.keyCode === 123) {
-          e.preventDefault();
-          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+Shift+I (Developer Tools)
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-          e.preventDefault();
-          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+U (View Source)
-        if (e.ctrlKey && e.keyCode === 85) {
-          e.preventDefault();
-          showSecurityAlert('การดูซอร์สโค้ดไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+S (Save Page) - ยกเว้นเมื่ออยู่ใน input/textarea
-        if (e.ctrlKey && e.keyCode === 83 && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-          e.preventDefault();
-          showSecurityAlert('การบันทึกหน้าเว็บไม่ได้รับอนุญาต');
-          return false;
-        }
-      });
+      const place = computePlacement(availW, availH, imgWpt_actual, imgHpt_actual, fit);
 
-      // ป้องกันการเลือกข้อความ (ยกเว้นใน input/textarea และ element ที่จำเป็น)
-      document.addEventListener('selectstart', function(e) {
-        if (!['INPUT', 'TEXTAREA', 'BUTTON'].includes(e.target.tagName) && 
-            !e.target.closest('[contenteditable]') &&
-            !e.target.closest('.allow-select')) {
-          e.preventDefault();
-          return false;
-        }
-      });
+      // draw the image (offset by margins)
+      doc.addImage(it.dataURL, 'JPEG', marginPt + place.x, marginPt + place.y, place.w, place.h);
 
-      // ป้องกันการลากเฉพาะรูปภาพ
-      document.addEventListener('dragstart', function(e) {
-        if (e.target.tagName === 'IMG') {
-          e.preventDefault();
-          return false;
-        }
-      });
+      const pct = Math.round(((i+1)/items.length)*100);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+    }
 
-      // ป้องกันการ print ด้วย CSS media query
-      const style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = `
-        @media print {
-          body { display: none !important; }
-          body::before { 
-            content: "การพิมพ์เอกสารนี้ไม่ได้รับอนุญาต"; 
-            font-size: 20px; 
-            color: red; 
-            display: block; 
-            text-align: center; 
-            margin-top: 50px; 
-          }
-        }
-      `;
-      document.head.appendChild(style);
+    // Export
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    downloadA.href = url;
+    result.classList.remove('hidden');
+  });
 
-      // ทำให้ window.showSecurityAlert สามารถเรียกใช้ได้จากภายนอก (สำหรับ debugging)
-      window.showSecurityAlert = showSecurityAlert;
+  // helper to reset state when the tool is opened
+  window.__resetJpg2Pdf = function(){
+    items = [];
+    if(listEl) listEl.innerHTML = "";
+    if(btn) btn.disabled = true;
+    if(result) result.classList.add('hidden');
+    if(progress) progress.classList.add('hidden');
+    if(downloadA) downloadA.removeAttribute('href');
+  };
 
-      console.log('🔒 Security protection activated (lite version)');
-
-    })();
-  </script>
+  // Hook open-tool custom event if any
+  document.addEventListener('open-tool', function(e){
+    if(e && e.detail && e.detail.tool === 'jpg-to-pdf'){
+      window.__resetJpg2Pdf();
+    }
+  });
+})();
+</script>
 
 
   <!-- JavaScript -->
@@ -5163,11 +5373,473 @@
     window.prevProtectPreview = prevProtectPreview;
     window.nextProtectPreview = nextProtectPreview;
   </script>
+
+<script>
+// ===== JPG to PDF =====
+(function(){
+  const listEl = document.getElementById('jpg2pdf-list');
+  const dropZone = document.getElementById('jpg2pdf-drop-zone');
+  const input = document.getElementById('jpg2pdf-files');
+  const btn = document.getElementById('jpg2pdf-generate');
+  const pageSizeSel = document.getElementById('jpg2pdf-page-size');
+  const fitSel = document.getElementById('jpg2pdf-fit');
+  const marginInput = document.getElementById('jpg2pdf-margin');
+  const orientSel = document.getElementById('jpg2pdf-orientation');
+  const dpiInput = document.getElementById('jpg2pdf-dpi');
+  const progress = document.getElementById('jpg2pdf-progress');
+  const progressBar = document.getElementById('jpg2pdf-progress-bar');
+  const progressText = document.getElementById('jpg2pdf-progress-text');
+  const result = document.getElementById('jpg2pdf-result');
+  const downloadA = document.getElementById('jpg2pdf-download');
+
+  if(!dropZone || !input) return; // avoid errors if section not present
+
+  let items = []; // {name, type, dataURL, w, h}
+
+  function mm2pt(mm){ return mm * 72.0 / 25.4; }
+  function in2pt(_in){ return _in * 72.0; }
+
+  const presetSizes = {
+    'a4': [mm2pt(210), mm2pt(297)],
+    'letter': [in2pt(8.5), in2pt(11) ],
+    'legal': [in2pt(8.5), in2pt(14) ]
+  };
+
+  function enableGenerate(){
+    btn.disabled = items.length === 0;
+  }
+
+  function renderList(){
+    listEl.innerHTML = "";
+    items.forEach((it, idx)=>{
+      const card = document.createElement('div');
+      card.className = "pdf-card relative";
+      card.setAttribute('draggable', 'true');
+      card.dataset.index = idx;
+
+      const thumb = document.createElement('div');
+      thumb.className = "pdf-thumbnail";
+      const img = document.createElement('img');
+      img.src = it.dataURL;
+      img.alt = it.name;
+      img.className = "object-contain w-full h-full";
+      thumb.appendChild(img);
+
+      const num = document.createElement('div');
+      num.className = "page-number";
+      num.textContent = (idx+1);
+
+      const remove = document.createElement('div');
+      remove.className = "remove-btn";
+      remove.title = "ลบ";
+      remove.innerHTML = "✖";
+      remove.addEventListener('click', ()=>{
+        items.splice(idx,1);
+        renderList();
+        enableGenerate();
+      });
+
+      // drag handlers
+      card.addEventListener('dragstart', (e)=>{
+        e.dataTransfer.setData('text/plain', idx.toString());
+        card.classList.add('dragging');
+      });
+      card.addEventListener('dragend', ()=> card.classList.remove('dragging'));
+      card.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        card.classList.add('drag-over');
+      });
+      card.addEventListener('dragleave', ()=> card.classList.remove('drag-over'));
+      card.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const from = parseInt(e.dataTransfer.getData('text/plain'),10);
+        const to = idx;
+        if(!Number.isNaN(from) && from !== to){
+          const [moved] = items.splice(from,1);
+          items.splice(to,0,moved);
+          renderList();
+        }
+      });
+
+      card.appendChild(thumb);
+      card.appendChild(num);
+      card.appendChild(remove);
+      listEl.appendChild(card);
+    });
+  }
+
+  
+  async function filesToItems(fileList){
+    const all = Array.from(fileList || []);
+    const files = all.filter(f => {
+      const t = (f.type || '').toLowerCase();
+      const n = (f.name || '').toLowerCase();
+      // allow common bitmap images; exclude svg
+      const isImgType = t.startsWith('image/') && t !== 'image/svg+xml';
+      const isExtOk = /\.(jpe?g|png|webp)$/i.test(n);
+      return isImgType || isExtOk;
+    });
+    for(const f of files){
+      const dataURL = await new Promise((resolve,reject)=>{
+        const fr = new FileReader();
+        fr.onload = ()=> resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(f);
+      });
+      // Load image to get dimensions
+      const dims = await new Promise((resolve,reject)=>{
+        const im = new Image();
+        im.onload = ()=> resolve({w: im.naturalWidth, h: im.naturalHeight, el: im});
+        im.onerror = reject;
+        im.src = dataURL;
+      });
+      // Normalize to JPEG (some browsers use image/jpg, pjpeg, png, webp)
+      // Use a canvas to convert non-JPEG inputs
+      let outDataURL = dataURL;
+      const mime = (f.type || '').toLowerCase();
+      if (!/image\/jpe?g/.test(mime)) {
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, dims.w);
+        canvas.height = Math.max(1, dims.h);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(dims.el, 0, 0);
+        outDataURL = canvas.toDataURL('image/jpeg', 0.92);
+      }
+      items.push({ name: f.name, type: 'image/jpeg', dataURL: outDataURL, w: dims.w, h: dims.h });
+    }
+    renderList();
+    enableGenerate();
+  }
+renderList();
+    enableGenerate();
+  }
+
+  // Drop zone events
+  dropZone.addEventListener('click', ()=> input.click());
+  dropZone.addEventListener('dragover', (e)=>{
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', ()=> dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if(e.dataTransfer && e.dataTransfer.files){
+      filesToItems(e.dataTransfer.files);
+    }
+  });
+
+  input.addEventListener('change', ()=> {
+  const before = items.length;
+  filesToItems(input.files).then(()=>{
+    if(items.length === before){ alert('ไฟล์รูปภาพที่เลือกไม่รองรับ กรุณาเลือก JPG/PNG/WebP'); }
+  });
+});
+async function generate(){
+    if(items.length === 0) return;
+
+    result.classList.add('hidden');
+    progress.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressText.textContent = '0%';
+
+    const margin = Math.max(0, parseFloat(marginInput.value||'0'));
+    const dpi = Math.max(72, parseInt(dpiInput.value||'150',10));
+    const fit = fitSel.value;
+    const ps = pageSizeSel.value;
+    const orientationSel = orientSel.value;
+
+    // lazy import jsPDF from global
+    const { jsPDF } = window.jspdf;
+
+    // Init later because "fit-image" may change page per image
+    let doc = null;
+    let firstPageDone = false;
+
+    function computePlacement(pageW, pageH, imgWpx, imgHpx){
+      const marginPt = mm2pt(margin);
+      const availW = Math.max(0, pageW - marginPt*2);
+      const availH = Math.max(0, pageH - marginPt*2);
+
+      // convert px to pt according to DPI for "actual"
+      const imgWpt_actual = imgWpx * 72 / dpi;
+      const imgHpt_actual = imgHpx * 72 / dpi;
+
+      let drawW = availW, drawH = availH;
+      if(fit === 'stretch'){
+        drawW = availW; drawH = availH;
+      }else if(fit === 'actual'){
+        drawW = Math.min(availW, imgWpt_actual);
+        drawH = Math.min(availH, imgHpt_actual);
+      }else{
+        // contain / cover use intrinsic ratio based on actual-size points
+        const iw = imgWpt_actual;
+        const ih = imgHpt_actual;
+        const rImg = iw/ih;
+        const rBox = availW/availH;
+
+        if(fit === 'contain'){
+          if(rImg > rBox){ // limited by width
+            drawW = availW;
+            drawH = availW / rImg;
+          }else{
+            drawH = availH;
+            drawW = availH * rImg;
+          }
+        }else if(fit === 'cover'){
+          if(rImg > rBox){ // limited by height -> overflow width
+            drawH = availH;
+            drawW = availH * rImg;
+          }else{
+            drawW = availW;
+            drawH = availW / rImg;
+          }
+        }
+      }
+
+      const x = (pageW - drawW) / 2;
+      const y = (pageH - drawH) / 2;
+      return { x, y, w: drawW, h: drawH };
+    }
+
+    // helper to pick orientation auto if requested
+    function pickOrientation(imgW, imgH){
+      if(orientationSel === 'p' || orientationSel === 'l') return orientationSel;
+      // auto
+      return (imgW >= imgH) ? 'l' : 'p';
+    }
+
+    for (let i=0;i<items.length;i++){
+      const it = items[i];
+
+      // Page size per mode
+      let pageW = presetSizes['a4'][0], pageH = presetSizes['a4'][1];
+      let pageOrientation = pickOrientation(it.w, it.h);
+
+      if(ps === 'a4' || ps === 'letter' || ps === 'legal'){
+        [pageW, pageH] = presetSizes[ps];
+        if(pageOrientation === 'l') [pageW, pageH] = [pageH, pageW]; // swap
+        if(!doc){
+          doc = new jsPDF({ unit:'pt', format: [pageW, pageH] });
+        }else if(firstPageDone){
+          doc.addPage([pageW, pageH], pageOrientation === 'l' ? 'landscape' : 'portrait');
+        }
+      
+      }else if(ps === 'fit-image'){
+        // size per image using DPI
+        const iwpt = it.w * 72 / dpi;
+        const ihpt = it.h * 72 / dpi;
+        pageOrientation = pickOrientation(it.w, it.h);
+        let wpt = iwpt, hpt = ihpt;
+        if(pageOrientation === 'l' && wpt < hpt){
+          const tmp = wpt; wpt = hpt; hpt = tmp;
+        }
+        pageW = wpt; pageH = hpt;
+        if(!doc){
+          doc = new jsPDF({ unit:'pt', format: [pageW, pageH] });
+        }else if(firstPageDone){
+          doc.addPage([pageW, pageH], pageOrientation === 'l' ? 'landscape' : 'portrait');
+        }
+      }
+);
+        }else if(firstPageDone){
+          doc.addPage([pageW, pageH], pageOrientation === 'l' ? 'landscape' : 'portrait');
+        }
+      }
+
+      // On first iteration when doc just created, we don't need addPage
+      if(firstPageDone === false && doc){
+        // nothing
+      }else if(firstPageDone === true && ps !== 'fit-image'){
+        // ensure addPage already called above
+      }
+
+      const place = computePlacement(pageW, pageH, it.w, it.h);
+
+      // draw the image
+      // jsPDF accepts dataURL
+      doc.addImage(it.dataURL, 'JPEG', place.x, place.y, place.w, place.h);
+
+      firstPageDone = true;
+
+      // progress
+      const pct = Math.round(((i+1)/items.length)*100);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      await new Promise(r=> setTimeout(r, 0)); // yield to UI
+    }
+
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    downloadA.href = url;
+    result.classList.remove('hidden');
+    progress.classList.add('hidden');
+  }
+
+  btn.addEventListener('click', generate);
+
+  // Public hook: when opening this tool, clear previous state
+  window.__resetJpg2Pdf = function(){
+    items = [];
+    listEl.innerHTML = "";
+    btn.disabled = true;
+    result.classList.add('hidden');
+    progress.classList.add('hidden');
+  };
+
+  // If your existing openTool system dispatches a custom event, wire here:
+  document.addEventListener('open-tool', function(e){
+    if(e.detail && e.detail.tool === 'jpg-to-pdf'){
+      window.__resetJpg2Pdf();
+    }
+  });
+})();
+</script>
+
+
+<script>
+// === Lightweight Security Layer (best-effort, non-intrusive) ===
+(function(){
+  // Allow context menu for inputs, textareas, contenteditable
+  function isEditingElement(el){
+    if (!el) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
+    if (el.isContentEditable) return true;
+    return false;
+  }
+  // 1) Block right-click except on editable fields
+  document.addEventListener('contextmenu', function(e){
+    if (!isEditingElement(e.target)) {
+      e.preventDefault();
+    }
+  }, { capture: true });
+
+  // 2) Block F12 and 3) Block Ctrl+Shift+I (best effort)
+  document.addEventListener('keydown', function(e){
+    const key = (e.key || '').toLowerCase();
+    if (key === 'f12' || (e.ctrlKey && e.shiftKey && key === 'i')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
+
+  // 4) Secure upload guard (JPG/PDF/Office) — best-effort static checks
+  function bytesStartWith(u8, sig){ 
+    for (let i=0; i<sig.length; i++){ if (u8[i] !== sig[i]) return false; }
+    return true;
+  }
+  function isOOXML(u8){ // ZIP header 'PK'
+    return u8 && u8.length >= 4 && u8[0] === 0x50 && u8[1] === 0x4B;
+  }
+  async function scanFile(file){
+    try{
+      const name = (file.name || '').toLowerCase();
+      const badExt = ['.exe','.js','.vbs','.jar','.bat','.cmd','.com','.scr','.pif','.msi','.ps1','.dll'];
+      if (badExt.some(ext => name.endsWith(ext))) {
+        return { ok: false, reason: 'นามสกุลต้องห้าม' };
+      }
+      // double-extension like a.jpg.exe
+      const parts = name.split('.');
+      if (parts.length >= 3){
+        const last = '.' + parts.pop();
+        const prev = '.' + parts.pop();
+        const dangerous = ['.exe','.js','.vbs','.scr','.bat','.cmd','.com','.jar','.msi','.ps1'];
+        const safePrev = ['.jpg','.jpeg','.png','.webp','.pdf','.doc','.docx','.xls','.xlsx','.ppt','.pptx'];
+        if (dangerous.includes(last) && safePrev.includes(prev)){
+          return { ok: false, reason: 'นามสกุลซ้อนผิดปกติ' };
+        }
+      }
+
+      // read a small slice first
+      const headBuf = await file.slice(0, 8192).arrayBuffer();
+      const u8 = new Uint8Array(headBuf);
+
+      if (/\.(jpe?g|png|webp)$/i.test(file.name)){
+        const isJpg = bytesStartWith(u8, [0xFF,0xD8,0xFF]);
+        const isPng = bytesStartWith(u8, [0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A]);
+        const isWebp = bytesStartWith(u8, [0x52,0x49,0x46,0x46]) && u8[8]===0x57 && u8[9]===0x45 && u8[10]===0x42 && u8[11]===0x50;
+        if (!(isJpg || isPng || isWebp)) {
+          return { ok: false, reason: 'ลายเซ็นไฟล์ไม่ตรงชนิดรูปภาพ' };
+        }
+      } else if (/\.pdf$/i.test(file.name)){
+        const headText = new TextDecoder('latin1').decode(u8);
+        if (!headText.startsWith('%PDF')) {
+          return { ok: false, reason: 'ไม่ใช่ไฟล์ PDF ที่ถูกต้อง' };
+        }
+        // crude detection of embedded JS/actions
+        const danger = [/\/JS\b/i, /\/JavaScript\b/i, /\/AA\b/i, /\/OpenAction\b/i, /\bLaunch\b/i, /\bSubmitForm\b/i];
+        if (danger.some(rx => rx.test(headText))) {
+          return { ok: false, reason: 'PDF มีสคริปต์/Action ที่อาจเป็นอันตราย' };
+        }
+      } else if (/\.(docx|xlsx|pptx)$/i.test(file.name)){
+        if (!isOOXML(u8)){
+          return { ok: false, reason: 'ไฟล์ Office ไม่ถูกต้อง (คาดว่าไม่ใช่ ZIP/OpenXML)' };
+        }
+        // scan for macro container
+        const full = await file.arrayBuffer();
+        const text = new TextDecoder('latin1').decode(new Uint8Array(full));
+        if (/vbaProject\.bin/i.test(text)){
+          return { ok: false, reason: 'ตรวจพบมาโคร (vbaProject.bin)' };
+        }
+      } else if (/\.(doc|xls)$/i.test(file.name)){
+        return { ok: false, reason: 'บล็อกไฟล์ Office รุ่นเก่า (.doc/.xls) เพื่อความปลอดภัย' };
+      }
+      return { ok: true };
+    }catch(err){
+      console.warn('scanFile-error', err);
+      return { ok: false, reason: 'ไม่สามารถตรวจสอบไฟล์ได้' };
+    }
+  }
+
+  async function secureScanFiles(fileList){
+    const files = Array.from(fileList || []);
+    for (const f of files){
+      const res = await scanFile(f);
+      if (!res.ok){
+        alert('บล็อกไฟล์ที่ไม่ปลอดภัย: ' + (f.name||'') + '\\nสาเหตุ: ' + res.reason);
+        return false;
+      }
+    }
+    return true;
+  }
+  window.secureScanFiles = secureScanFiles; // expose for existing tools
+
+  // Guard all <input type="file"> changes
+  function attachInputGuards(){
+    document.querySelectorAll('input[type="file"]').forEach(inp => {
+      if (inp.__secureGuardAttached) return;
+      inp.__secureGuardAttached = true;
+      inp.addEventListener('change', async () => {
+        if (!inp.files || inp.files.length === 0) return;
+        const ok = await secureScanFiles(inp.files);
+        if (!ok) {
+          inp.value = '';
+          inp.dispatchEvent(new Event('secure-upload-blocked'));
+        }
+      });
+    });
+  }
+  attachInputGuards();
+  document.addEventListener('open-tool', attachInputGuards, { passive: true });
+
+  // Optional: guard drops in generic zones (best effort, non-blocking)
+  document.addEventListener('drop', async (e) => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length){
+      // Run scan in background; if risky, show alert. Original drop handler may already start reading;
+      // this is best-effort without breaking UX.
+      const ok = await secureScanFiles(dt.files);
+      if (!ok){
+        // try to cancel subsequent processing
+        e.stopImmediatePropagation();
+      }
+    }
+  }, true);
+})();
+</script>
+
 </body>
 </html>
-
-
-
-
-
-
