@@ -385,7 +385,93 @@
       max-width: 100%;
       max-height: 400px;
     }
-  </style>
+  
+
+    /* ===== PDF TOOLS ADDON (Delete Page + Insert Page No.) ===== */
+      /* ===== DELETE PAGE TOOL ===== */
+      .delete-page-item {
+        position: relative;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        cursor: pointer;
+        aspect-ratio: 3/4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .delete-page-item:hover { border-color: #f87171; box-shadow: 0 4px 14px rgba(239,68,68,0.18); }
+      .delete-page-item.dp-marked { border-color: #ef4444; box-shadow: 0 4px 14px rgba(239,68,68,0.35); }
+      .dp-thumb-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+      .dp-overlay {
+        position: absolute; inset: 0;
+        background: rgba(239, 68, 68, 0.55);
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 0.2s; z-index: 5; font-size: 2rem;
+      }
+      .delete-page-item.dp-marked .dp-overlay { opacity: 1; }
+      .dp-page-badge {
+        position: absolute; bottom: 4px; left: 4px;
+        background: rgba(0,0,0,0.65); color: white;
+        border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 700; z-index: 10;
+      }
+      .dp-del-badge {
+        position: absolute; top: 5px; right: 5px;
+        background: #ef4444; color: white;
+        border-radius: 50%; width: 22px; height: 22px;
+        font-size: 11px; font-weight: 700;
+        display: none; align-items: center; justify-content: center; z-index: 10;
+      }
+      .delete-page-item.dp-marked .dp-del-badge { display: flex; }
+
+      /* ===== INSERT PAGE NUMBER TOOL ===== */
+      #pagenum-wrap { position: relative; display: inline-block; line-height: 0; }
+      #pagenum-canvas { border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); display: block; max-width: 100%; }
+      #pagenum-handle {
+        position: absolute;
+        background: transparent !important; /* ซ่อนกรอบ/พื้นหลังของตัวอย่าง */
+        color: #000000;
+        padding: 2px 6px; /* เพิ่มพื้นที่คลิก (ไม่แสดงกรอบ) */
+        border-radius: 0;
+        cursor: move;
+        user-select: none;
+        white-space: nowrap;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+        z-index: 20;
+        transition: none;
+        touch-action: none;
+      }
+      #pagenum-handle:hover { box-shadow: 0 4px 18px rgba(13,148,136,0.6); }
+      #pagenum-handle.pn-dragging { box-shadow: 0 8px 24px rgba(13,148,136,0.65); cursor: grabbing; }
+      .pn-pos-btn {
+        padding: 5px 4px; border: 2px solid #e5e7eb; border-radius: 6px;
+        cursor: pointer; transition: all 0.2s; text-align: center; font-size: 11px; background: white;
+      }
+      .pn-pos-btn:hover { border-color: #0d9488; background: #f0fdfa; }
+      .pn-pos-btn.pn-active { border-color: #0d9488; background: #ccfbf1; color: #0d9488; font-weight: 700; }
+      .pn-tab-btn {
+        flex: 1; padding: 7px 4px; border-radius: 6px;
+        font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
+      }
+      .pn-tab-btn.pn-tab-active { background: #0d9488; color: white; }
+      .pn-tab-btn:not(.pn-tab-active) { background: #f1f5f9; color: #64748b; }
+      .pn-tab-btn:not(.pn-tab-active):hover { background: #e2e8f0; }
+      .pn-thumb-wrap { position: relative; cursor: pointer; }
+      .pn-thumb-wrap img { width: 100%; border-radius: 5px; border: 2px solid #e5e7eb; transition: border-color 0.2s; }
+      .pn-thumb-wrap:hover img { border-color: #0d9488; }
+      .pn-thumb-badge {
+        position: absolute; bottom: 3px; left: 3px;
+        background: rgba(0,0,0,0.6); color: white;
+        border-radius: 3px; padding: 1px 5px; font-size: 10px; font-weight: 700;
+      }
+    /* ===== END ADDON CSS ===== */
+</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
   <!-- Header -->
@@ -514,7 +600,23 @@
         </div>
       </div>
 
-    </section>
+          <div class="tool-card bg-white rounded-xl p-6 shadow-md hover:shadow-xl" onclick="openTool('delete-page')">
+        <div class="text-center">
+          <div class="tool-icon text-rose-600">🗑️</div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Delete Page</h3>
+          <p class="text-gray-600 text-sm">ลบหน้าที่ไม่ต้องการออกจาก PDF</p>
+        </div>
+      </div>
+
+      <!-- ===== NEW CARD 2: Insert Page Number ===== -->
+      <div class="tool-card bg-white rounded-xl p-6 shadow-md hover:shadow-xl" onclick="openTool('insert-pagenum')">
+        <div class="text-center">
+          <div class="tool-icon text-teal-500">🔢</div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Insert Page No.</h3>
+          <p class="text-gray-600 text-sm">เพิ่มเลขหน้า / ลากวางตำแหน่งได้อิสระ</p>
+        </div>
+      </div>
+</section>
 
     <!-- Sign PDF Tool -->
     <section id="sign-tool" class="hidden">
@@ -1819,7 +1921,425 @@
     </section>
 
 
-  </main>
+  
+    <section id="delete-page-tool" class="hidden">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">🗑️ Delete PDF Pages</h2>
+          <p class="text-gray-600">คลิกที่หน้าที่ต้องการลบ (สีแดง) แล้วกดปุ่มด้านขวา</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Main area -->
+          <div class="lg:col-span-3">
+            <!-- Drop zone -->
+            <div id="delpage-drop-zone" class="file-drop-zone border-2 border-dashed border-gray-300 rounded-xl p-12 text-center mb-6 cursor-pointer">
+              <div class="animate-bounce-gentle mb-4 text-6xl text-gray-400">🗑️</div>
+              <h3 class="text-xl font-semibold text-gray-700 mb-2">ลากไฟล์ PDF หรือคลิกเพื่อเลือก</h3>
+              <p class="text-gray-500 mb-4">รองรับ PDF ทุกขนาด</p>
+              <input type="file" id="delpage-file" accept=".pdf" class="hidden">
+              <button onclick="document.getElementById('delpage-file').click()"
+                class="bg-rose-600 text-white px-6 py-3 rounded-lg hover:bg-rose-700 transition-all">
+                เลือกไฟล์ PDF
+              </button>
+            </div>
+
+            <!-- Info bar (hidden until file loaded) -->
+            <div id="delpage-info-bar" class="hidden mb-4 p-4 bg-rose-50 border border-rose-200 rounded-xl
+                 flex flex-wrap items-center justify-between gap-3">
+              <div id="delpage-file-detail" class="text-rose-800 font-medium text-sm"></div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="dpSelectAll()"
+                  class="bg-white border border-rose-300 text-rose-700 px-3 py-1.5 rounded-lg text-sm hover:bg-rose-50 transition-all">
+                  เลือกทั้งหมด
+                </button>
+                <button onclick="dpDeselectAll()"
+                  class="bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition-all">
+                  ยกเลิกทั้งหมด
+                </button>
+                <button onclick="dpInvert()"
+                  class="bg-white border border-blue-300 text-blue-700 px-3 py-1.5 rounded-lg text-sm hover:bg-blue-50 transition-all">
+                  กลับการเลือก
+                </button>
+              </div>
+            </div>
+
+            <!-- Thumbnails grid -->
+            <div id="delpage-grid"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6"></div>
+
+            <!-- Progress -->
+            <div id="delpage-progress" class="hidden mb-4">
+              <div class="bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div id="delpage-progress-bar" class="h-full bg-rose-600 progress-bar" style="width:0%"></div>
+              </div>
+              <p class="text-center text-sm text-gray-600 mt-2">
+                กำลังประมวลผล... <span id="delpage-progress-text">0%</span>
+              </p>
+            </div>
+
+            <!-- Result -->
+            <div id="delpage-result" class="hidden bg-green-50 border border-green-200 rounded-xl p-6">
+              <h3 class="text-lg font-semibold text-green-800 mb-3">✅ ลบหน้าสำเร็จ!</h3>
+              <div id="delpage-result-text" class="text-green-700 mb-4"></div>
+              <div class="preview-container mb-4">
+                <h4 class="font-semibold text-gray-700 mb-3">ตัวอย่างผลลัพธ์:</h4>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm text-gray-500">เลื่อนดูหน้า</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="prevDelpagePreview()"
+                      class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm">⬅️</button>
+                    <span id="delpage-preview-info" class="text-sm text-gray-600 px-2">1/1</span>
+                    <button onclick="nextDelpagePreview()"
+                      class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm">➡️</button>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <canvas id="delpage-result-canvas" class="preview-canvas"></canvas>
+                </div>
+              </div>
+              <button onclick="downloadDelpageFile()"
+                class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all">
+                📥 ดาวน์โหลด PDF ที่ลบหน้าแล้ว
+              </button>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="lg:col-span-1">
+            <div class="control-panel">
+              <h3 class="text-lg font-bold text-gray-800 mb-5 text-center">Delete Pages</h3>
+
+              <!-- Counter -->
+              <div class="bg-rose-50 rounded-xl p-4 mb-5 text-center">
+                <div class="text-3xl font-bold text-rose-600" id="delpage-marked-count">0</div>
+                <div class="text-sm text-rose-700 font-medium">หน้าที่เลือกลบ</div>
+                <div class="text-xs text-gray-500 mt-1">
+                  จาก <span id="delpage-total-count">0</span> หน้าทั้งหมด
+                </div>
+              </div>
+
+              <!-- Quick select -->
+              <div class="mb-5">
+                <p class="text-sm font-semibold text-gray-700 mb-2">เลือกด่วน:</p>
+                <div class="space-y-1.5">
+                  <button onclick="dpSelectOdd()"
+                    class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-rose-50 border border-gray-200 hover:border-rose-300 rounded-lg text-sm transition-all">
+                    📄 หน้าคี่ (1, 3, 5 …)
+                  </button>
+                  <button onclick="dpSelectEven()"
+                    class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-rose-50 border border-gray-200 hover:border-rose-300 rounded-lg text-sm transition-all">
+                    📄 หน้าคู่ (2, 4, 6 …)
+                  </button>
+                  <button onclick="dpToggleRangeInputs()"
+                    class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-rose-50 border border-gray-200 hover:border-rose-300 rounded-lg text-sm transition-all">
+                    📐 ระบุช่วงหน้า …
+                  </button>
+                </div>
+              </div>
+
+              <!-- Range inputs -->
+              <div id="delpage-range-inputs" class="hidden mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <p class="text-xs text-gray-500 mb-2">ช่วงหน้าที่ต้องการลบ</p>
+                <div class="flex gap-2 items-center mb-2">
+                  <input id="dp-range-from" type="number" min="1" value="1"
+                    class="w-full p-2 border border-gray-300 rounded text-center text-sm">
+                  <span class="text-gray-500 text-sm">–</span>
+                  <input id="dp-range-to" type="number" min="1" value="1"
+                    class="w-full p-2 border border-gray-300 rounded text-center text-sm">
+                </div>
+                <button onclick="dpApplyRange()"
+                  class="w-full bg-rose-100 text-rose-700 py-1.5 rounded-lg text-sm hover:bg-rose-200 transition-all font-medium">
+                  ✓ ใช้งาน
+                </button>
+              </div>
+
+              <!-- Execute button -->
+              <button id="delpage-execute-btn" onclick="executeDeletePage()" disabled
+                class="w-full bg-rose-600 text-white py-4 rounded-xl text-lg font-bold hover:bg-rose-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md">
+                🗑️ ลบหน้าที่เลือก
+              </button>
+
+              <p class="text-xs text-gray-400 text-center mt-3">
+                หน้าที่ไม่ได้เลือกจะถูกเก็บไว้ในไฟล์ใหม่
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================
+         INSERT PAGE NUMBER TOOL SECTION
+    =================================================================== -->
+    <section id="insert-pagenum-tool" class="hidden">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">🔢 Insert Page Number</h2>
+          <p class="text-gray-600">เพิ่มเลขหน้าลงใน PDF — ลากตัวเลขสีเขียวเพื่อวางตำแหน่งได้อิสระ</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Main area -->
+          <div class="lg:col-span-3">
+            <!-- Drop zone -->
+            <div id="pn-drop-zone" class="file-drop-zone border-2 border-dashed border-gray-300 rounded-xl p-12 text-center mb-6 cursor-pointer">
+              <div class="animate-bounce-gentle mb-4 text-6xl text-gray-400">🔢</div>
+              <h3 class="text-xl font-semibold text-gray-700 mb-2">ลากไฟล์ PDF หรือคลิกเพื่อเลือก</h3>
+              <p class="text-gray-500 mb-4">รองรับ PDF ทุกขนาด</p>
+              <input type="file" id="pn-file" accept=".pdf" class="hidden">
+              <button onclick="document.getElementById('pn-file').click()"
+                class="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-all">
+                เลือกไฟล์ PDF
+              </button>
+            </div>
+
+            <!-- Preview section (hidden until file loaded) -->
+            <div id="pn-preview-section" class="hidden">
+              <!-- Tabs -->
+              <div class="flex gap-1 mb-4 bg-gray-100 p-1 rounded-xl" style="max-width:280px">
+                <button class="pn-tab-btn pn-tab-active" id="pn-tab-preview-btn"
+                  onclick="pnSwitchTab('preview')">🖼️ Preview & Drag</button>
+                <button class="pn-tab-btn" id="pn-tab-thumbs-btn"
+                  onclick="pnSwitchTab('thumbs')">📋 Thumbnails</button>
+              </div>
+
+              <!-- ── Preview Tab ── -->
+              <div id="pn-tab-preview-content">
+                <div class="bg-white rounded-xl shadow p-4 mb-4">
+                  <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div class="flex items-center gap-2">
+                      <button onclick="pnPrevPage()"
+                        class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">⬅️</button>
+                      <span id="pn-page-nav" class="text-sm text-gray-600 px-2 font-medium">หน้า 1/1</span>
+                      <button onclick="pnNextPage()"
+                        class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">➡️</button>
+                    </div>
+                    <span class="text-xs text-teal-600 font-medium bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                      🖱️ ลากกล่องสีเขียวเพื่อกำหนดตำแหน่ง
+                    </span>
+                  </div>
+                  <div class="flex justify-center overflow-auto">
+                    <div id="pagenum-wrap">
+                      <canvas id="pagenum-canvas"></canvas>
+                      <div id="pagenum-handle">
+                        <span id="pn-handle-text">1</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Thumbnails Tab ── -->
+              <div id="pn-tab-thumbs-content" class="hidden">
+                <div class="bg-white rounded-xl shadow p-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold text-gray-700">ตัวอย่างทุกหน้า</h4>
+                    <span class="text-xs text-gray-400">คลิกหน้าเพื่อดู Preview</span>
+                  </div>
+                  <div id="pn-thumbs-grid"
+                    class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div id="pn-progress" class="hidden mb-4">
+              <div class="bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div id="pn-progress-bar" class="h-full bg-teal-600 progress-bar" style="width:0%"></div>
+              </div>
+              <p class="text-center text-sm text-gray-600 mt-2">
+                กำลังเพิ่มเลขหน้า... <span id="pn-progress-text">0%</span>
+              </p>
+            </div>
+
+            <!-- Result -->
+            <div id="pn-result" class="hidden bg-green-50 border border-green-200 rounded-xl p-6">
+              <h3 class="text-lg font-semibold text-green-800 mb-3">✅ เพิ่มเลขหน้าสำเร็จ!</h3>
+              <div id="pn-result-text" class="text-green-700 mb-4"></div>
+              <div class="preview-container mb-4">
+                <h4 class="font-semibold text-gray-700 mb-3">ตัวอย่างผลลัพธ์:</h4>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm text-gray-500">เลื่อนดูหน้า</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="prevPnPreview()"
+                      class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm">⬅️</button>
+                    <span id="pn-preview-info" class="text-sm text-gray-600 px-2">1/1</span>
+                    <button onclick="nextPnPreview()"
+                      class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm">➡️</button>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <canvas id="pn-result-canvas" class="preview-canvas"></canvas>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button onclick="downloadPnFile()"
+                  class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all">
+                  📥 ดาวน์โหลด PDF ที่มีเลขหน้า
+                </button>
+                <button onclick="pnReset()"
+                  class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all">
+                  🔄 เริ่มใหม่
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Options Sidebar -->
+          <div class="lg:col-span-1">
+            <div class="control-panel" style="max-height:90vh; overflow-y:auto;">
+              <h3 class="text-lg font-bold text-gray-800 mb-5 text-center">ตั้งค่าเลขหน้า</h3>
+
+              <!-- Font -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">ฟอนต์ภาษาไทย:</label>
+                <select id="pn-font" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm"
+                  onchange="pnUpdateHandle()">
+                  <option value="Sarabun">Sarabun (สารบัญ)</option>
+                  <option value="TH Sarabun PSK">TH Sarabun PSK</option>
+                  <option value="TH Sarabun IT9">TH Sarabun IT9</option>
+                  <option value="TH Sarabun New">TH Sarabun New</option>
+                  <option value="Prompt">Prompt</option>
+                  <option value="Kanit">Kanit</option>
+                  <option value="Mitr">Mitr</option>
+                  <option value="Noto Sans Thai">Noto Sans Thai</option>
+                  <option value="Noto Serif Thai">Noto Serif Thai</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Helvetica">Helvetica</option>
+                </select>
+              </div>
+
+              <!-- Font Size -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                  ขนาด: <span id="pn-size-val" class="text-teal-600 font-bold">14</span> pt
+                </label>
+                <input type="range" id="pn-size" min="8" max="40" value="14" class="w-full"
+                  oninput="document.getElementById('pn-size-val').textContent=this.value; pnUpdateHandle()">
+              </div>
+
+              <!-- Color -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">สีตัวอักษร:</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" id="pn-color" value="#000000"
+                    class="w-10 h-10 rounded border border-gray-300 cursor-pointer"
+                    onchange="pnUpdateHandle()">
+                  <div class="flex gap-1 flex-wrap">
+                    <div onclick="document.getElementById('pn-color').value='#000000'; pnUpdateHandle()"
+                      class="w-7 h-7 rounded cursor-pointer border border-gray-300 bg-black" title="ดำ"></div>
+                    <div onclick="document.getElementById('pn-color').value='#374151'; pnUpdateHandle()"
+                      class="w-7 h-7 rounded cursor-pointer border border-gray-300" style="background:#374151" title="เทาเข้ม"></div>
+                    <div onclick="document.getElementById('pn-color').value='#1d4ed8'; pnUpdateHandle()"
+                      class="w-7 h-7 rounded cursor-pointer border border-gray-300" style="background:#1d4ed8" title="น้ำเงิน"></div>
+                    <div onclick="document.getElementById('pn-color').value='#dc2626'; pnUpdateHandle()"
+                      class="w-7 h-7 rounded cursor-pointer border border-gray-300" style="background:#dc2626" title="แดง"></div>
+                    <div onclick="document.getElementById('pn-color').value='#0d9488'; pnUpdateHandle()"
+                      class="w-7 h-7 rounded cursor-pointer border border-gray-300" style="background:#0d9488" title="เขียว"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Format -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">รูปแบบ:</label>
+                <select id="pn-format" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm"
+                  onchange="pnUpdateHandle()">
+                  <option value="n">1, 2, 3 …</option>
+                  <option value="n/N">1/10, 2/10 …</option>
+                  <option value="Page n">Page 1, Page 2 …</option>
+                  <option value="Page n/N">Page 1/10 …</option>
+                  <option value="หน้า n">หน้า 1, หน้า 2 …</option>
+                  <option value="หน้า n/N">หน้า 1/10 …</option>
+                  <option value="- n -">- 1 -, - 2 - …</option>
+                </select>
+              </div>
+
+
+              <!-- Content Mode -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">เนื้อหา:</label>
+                <select id="pn-content-mode" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm"
+                  onchange="pnToggleCustomText(); pnUpdateHandle()">
+                  <option value="num" selected>เลขหน้า</option>
+                  <option value="text">ข้อความ</option>
+                  <option value="both">ข้อความ + เลขหน้า</option>
+                </select>
+                <div id="pn-custom-text-wrap" class="hidden mt-2">
+                  <input id="pn-custom-text" type="text" placeholder="เช่น เอกสารแนบ / ภาคผนวก / Confidential"
+                    class="w-full p-2.5 border border-gray-300 rounded-lg text-sm"
+                    oninput="pnUpdateHandle()">
+                  <p class="text-xs text-gray-400 mt-1">ข้อความจะถูกวางตำแหน่งเดียวกับตัวอย่างบนหน้า Preview</p>
+                </div>
+              </div>
+
+              <!-- Start Number -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">เริ่มนับจากเลข:</label>
+                <input type="number" id="pn-start" min="1" value="1"
+                  class="w-full p-2.5 border border-gray-300 rounded-lg text-sm text-center"
+                  onchange="pnUpdateHandle()">
+              </div>
+
+              <!-- Position Presets -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ตำแหน่งด่วน (9 จุด):</label>
+                <div class="grid grid-cols-3 gap-1.5">
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.05,0.95,this)">↖ บน-ซ้าย</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.5,0.95,this)">↑ บน-กลาง</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.95,0.95,this)">↗ บน-ขวา</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.05,0.5,this)">← กลาง-ซ้าย</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.5,0.5,this)">⊙ กลาง</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.95,0.5,this)">→ กลาง-ขวา</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.05,0.05,this)">↙ ล่าง-ซ้าย</button>
+                  <button class="pn-pos-btn pn-active" onclick="pnSetPresetPos(0.5,0.05,this)">↓ ล่าง-กลาง</button>
+                  <button class="pn-pos-btn" onclick="pnSetPresetPos(0.95,0.05,this)">↘ ล่าง-ขวา</button>
+                </div>
+                <p class="text-xs text-gray-400 mt-1.5 text-center">หรือลากกล่องสีเขียวบนหน้าตัวอย่าง</p>
+              </div>
+
+              <!-- Scope -->
+              <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">ใส่เลขหน้าใน:</label>
+                <select id="pn-pages-scope" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm"
+                  onchange="pnToggleRange()">
+                  <option value="all">ทุกหน้า</option>
+                  <option value="odd">หน้าคี่เท่านั้น</option>
+                  <option value="even">หน้าคู่เท่านั้น</option>
+                  <option value="from2">ตั้งแต่หน้า 2 เป็นต้นไป</option>
+                  <option value="range">ระบุช่วงหน้า</option>
+                </select>
+                <div id="pn-range-inputs" class="hidden mt-2 flex gap-2 items-center">
+                  <input id="pn-range-from" type="number" min="1" value="1"
+                    class="w-full p-2 border border-gray-300 rounded text-center text-sm">
+                  <span class="text-gray-400">–</span>
+                  <input id="pn-range-to" type="number" min="1" value="99"
+                    class="w-full p-2 border border-gray-300 rounded text-center text-sm">
+                </div>
+              </div>
+
+              <!-- Background box -->
+              <div class="mb-5">
+                <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer">
+                  <input type="checkbox" id="pn-bg-box" class="rounded" onchange="pnUpdateHandle()">
+                  กล่องพื้นหลังสีขาว
+                </label>
+              </div>
+
+              <!-- Apply -->
+              <button id="pn-apply-btn" onclick="executeInsertPageNum()" disabled
+                class="w-full bg-teal-600 text-white py-4 rounded-xl text-base font-bold hover:bg-teal-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md">
+                🔢 เพิ่มเลขหน้า
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+</main>
 
    <!-- Security Protection Scripts -->
   <script>
@@ -5777,6 +6297,788 @@ async function generate(){
 })();
 </script>
 
+
+
+<script id="ADDON-JS">
+// ============================================================
+//  ADD-ON: เพิ่มเมนูใหม่ใน openTool() ที่มีอยู่
+//  (Monkey-patch — ไม่แตะโค้ดเดิม)
+// ============================================================
+(function() {
+  const _origOpenTool = window.openTool;
+  window.openTool = function(name) {
+    if (name === 'delete-page') {
+      // ซ่อน grid + ซ่อนทุก section เหมือนเดิม
+      const grid = document.getElementById('pdf-tools-grid');
+      if (grid) grid.classList.add('hidden');
+      document.querySelectorAll('[id$="-tool"]').forEach(s => s.classList.add('hidden'));
+      const el = document.getElementById('delete-page-tool');
+      if (el) el.classList.remove('hidden');
+      window.currentTool = 'delete-page';
+      initDeletePage();
+    } else if (name === 'insert-pagenum') {
+      const grid = document.getElementById('pdf-tools-grid');
+      if (grid) grid.classList.add('hidden');
+      document.querySelectorAll('[id$="-tool"]').forEach(s => s.classList.add('hidden'));
+      const el = document.getElementById('insert-pagenum-tool');
+      if (el) el.classList.remove('hidden');
+      window.currentTool = 'insert-pagenum';
+      initInsertPageNum();
+    } else {
+      _origOpenTool(name);
+    }
+  };
+})();
+
+// ============================================================
+//  DELETE PAGE — ตัวแปรและฟังก์ชัน
+// ============================================================
+var dpPdfDoc    = null;
+var dpPdfBytes  = null;
+var dpMarked    = new Set();
+var dpTotal     = 0;
+var dpResultBlob   = null;
+var dpPreviewBytes = null;
+var dpPreviewPage  = 0;
+var dpPreviewTotal = 0;
+var dpPreviewPdfjs  = null;
+var dpPreviewRenderTask = null;
+
+function initDeletePage() {
+  var fi = document.getElementById('delpage-file');
+  var dz = document.getElementById('delpage-drop-zone');
+  if (!fi || fi._dpInit) return;
+  fi._dpInit = true;
+
+  fi.addEventListener('change', function() { if (fi.files[0]) loadDpFile(fi.files[0]); });
+  dz.addEventListener('click', function(e) {
+    // Prevent double file picker when clicking the inner button
+    if (e && e.target && (e.target.closest && e.target.closest('button'))) return;
+    fi.click();
+  });
+  // Stop bubble from the inner button (safety)
+  var _btn = dz.querySelector('button');
+  if (_btn && !_btn._dpStopBubble) { _btn._dpStopBubble = true; _btn.addEventListener('click', function(ev){ ev.stopPropagation(); }); }
+
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('dragover'); });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault(); dz.classList.remove('dragover');
+    var files = Array.from(e.dataTransfer.files || []).filter(function(f) { return f.type === 'application/pdf'; });
+    if (files[0]) loadDpFile(files[0]);
+  });
+}
+
+async function loadDpFile(file) {
+  try {
+    dpPdfBytes = new Uint8Array(await file.arrayBuffer());
+    dpPdfDoc   = await PDFLib.PDFDocument.load(dpPdfBytes);
+    dpTotal    = dpPdfDoc.getPageCount();
+    dpMarked.clear();
+
+    document.getElementById('delpage-info-bar').classList.remove('hidden');
+    document.getElementById('delpage-drop-zone').classList.add('hidden');
+    document.getElementById('delpage-result').classList.add('hidden');
+    document.getElementById('delpage-file-detail').textContent =
+      '📄 ' + file.name + '  •  ' + (file.size/1024/1024).toFixed(2) + ' MB  •  ' + dpTotal + ' หน้า';
+    document.getElementById('delpage-total-count').textContent = dpTotal;
+    document.getElementById('dp-range-from').max = dpTotal;
+    document.getElementById('dp-range-to').max   = dpTotal;
+    document.getElementById('dp-range-to').value = dpTotal;
+
+    await buildDpThumbnails();
+    updateDpUI();
+  } catch(e) {
+    alert('ไม่สามารถโหลด PDF ได้: ' + e.message);
+  }
+}
+
+async function buildDpThumbnails() {
+  var grid  = document.getElementById('delpage-grid');
+  grid.innerHTML = '';
+  var pdfjs = await pdfjsLib.getDocument({ data: dpPdfBytes }).promise;
+
+  for (var i = 0; i < dpTotal; i++) {
+    var page = await pdfjs.getPage(i + 1);
+    var vp   = page.getViewport({ scale: 0.55 });
+    var cv   = document.createElement('canvas');
+    cv.width = vp.width; cv.height = vp.height;
+    await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+
+    var item = document.createElement('div');
+    item.className = 'delete-page-item';
+    item.dataset.idx = i;
+    item.title = 'หน้า ' + (i+1) + ' — คลิกเพื่อเลือก/ยกเลิกการลบ';
+
+    var img = document.createElement('img');
+    img.src = cv.toDataURL('image/jpeg', 0.75);
+    img.className = 'dp-thumb-img';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'dp-overlay';
+    overlay.innerHTML = '🗑️';
+
+    var badge = document.createElement('div');
+    badge.className = 'dp-del-badge'; badge.textContent = '✕';
+
+    var numBadge = document.createElement('div');
+    numBadge.className = 'dp-page-badge'; numBadge.textContent = i + 1;
+
+    item.appendChild(img);
+    item.appendChild(overlay);
+    item.appendChild(badge);
+    item.appendChild(numBadge);
+
+    (function(idx){ item.addEventListener('click', function() { dpTogglePage(idx); }); })(i);
+    grid.appendChild(item);
+  }
+}
+
+function dpTogglePage(idx) {
+  if (dpMarked.has(idx)) dpMarked.delete(idx);
+  else dpMarked.add(idx);
+  var item = document.querySelector('[data-idx="' + idx + '"]');
+  if (item) item.classList.toggle('dp-marked', dpMarked.has(idx));
+  updateDpUI();
+}
+
+function updateDpUI() {
+  document.getElementById('delpage-marked-count').textContent = dpMarked.size;
+  var canExecute = dpMarked.size > 0 && dpMarked.size < dpTotal;
+  document.getElementById('delpage-execute-btn').disabled = !canExecute;
+}
+
+function dpRefreshAll() {
+  for (var i = 0; i < dpTotal; i++) {
+    var item = document.querySelector('[data-idx="' + i + '"]');
+    if (item) item.classList.toggle('dp-marked', dpMarked.has(i));
+  }
+  updateDpUI();
+}
+
+function dpSelectAll()   { for (var i=0;i<dpTotal;i++) dpMarked.add(i);    dpRefreshAll(); }
+function dpDeselectAll() { dpMarked.clear();                                 dpRefreshAll(); }
+function dpInvert()      { for (var i=0;i<dpTotal;i++) { dpMarked.has(i) ? dpMarked.delete(i) : dpMarked.add(i); } dpRefreshAll(); }
+function dpSelectOdd()   { dpMarked.clear(); for (var i=0;i<dpTotal;i+=2) dpMarked.add(i);    dpRefreshAll(); }
+function dpSelectEven()  { dpMarked.clear(); for (var i=1;i<dpTotal;i+=2) dpMarked.add(i);    dpRefreshAll(); }
+function dpToggleRangeInputs() {
+  document.getElementById('delpage-range-inputs').classList.toggle('hidden');
+}
+function dpApplyRange() {
+  var from = parseInt(document.getElementById('dp-range-from').value) - 1;
+  var to   = parseInt(document.getElementById('dp-range-to').value)   - 1;
+  dpMarked.clear();
+  for (var i = Math.max(0,from); i <= Math.min(dpTotal-1, to); i++) dpMarked.add(i);
+  dpRefreshAll();
+}
+
+async function executeDeletePage() {
+  if (!dpPdfDoc || dpMarked.size === 0) return;
+  var prog = document.getElementById('delpage-progress');
+  var bar  = document.getElementById('delpage-progress-bar');
+  var txt  = document.getElementById('delpage-progress-text');
+  prog.classList.remove('hidden');
+  document.getElementById('delpage-result').classList.add('hidden');
+
+  try {
+    var newPdf = await PDFLib.PDFDocument.create();
+    var keep   = [];
+    for (var i = 0; i < dpTotal; i++) { if (!dpMarked.has(i)) keep.push(i); }
+
+    bar.style.width = '20%'; txt.textContent = '20%';
+    var pages = await newPdf.copyPages(dpPdfDoc, keep);
+    pages.forEach(function(p) { newPdf.addPage(p); });
+    bar.style.width = '80%'; txt.textContent = '80%';
+
+    var bytes = await newPdf.save();
+    dpResultBlob   = new Blob([bytes], { type: 'application/pdf' });
+    dpPreviewBytes = bytes;
+    dpPreviewPage  = 0;
+    // Cache PDF.js document for stable/fast preview navigation
+    dpPreviewPdfjs = await pdfjsLib.getDocument({ data: dpPreviewBytes }).promise;
+    dpPreviewTotal = (dpPreviewPdfjs && dpPreviewPdfjs.numPages) ? dpPreviewPdfjs.numPages : keep.length;
+    dpPreviewRenderTask = null;
+
+    bar.style.width = '100%'; txt.textContent = '100%';
+    setTimeout(async function() {
+      prog.classList.add('hidden');
+      document.getElementById('delpage-result').classList.remove('hidden');
+      document.getElementById('delpage-result-text').textContent =
+        'ลบ ' + dpMarked.size + ' หน้าออกแล้ว — เหลือ ' + keep.length + ' หน้าในไฟล์ใหม่';
+      if (keep.length > 0) await renderDpPreview(0);
+    }, 600);
+  } catch(e) {
+    alert('เกิดข้อผิดพลาด: ' + e.message);
+    prog.classList.add('hidden');
+  }
+}
+
+async function renderDpPreview(idx) {
+  try {
+    if (!dpPreviewBytes) return;
+    // Clamp
+    idx = Math.max(0, Math.min(idx, (dpPreviewTotal || 1) - 1));
+    dpPreviewPage = idx;
+
+    var canvas = document.getElementById('delpage-result-canvas');
+    if (!canvas) return;
+
+    var pdfjs = dpPreviewPdfjs;
+    if (!pdfjs) {
+      pdfjs = dpPreviewPdfjs = await pdfjsLib.getDocument({ data: dpPreviewBytes }).promise;
+      dpPreviewTotal = (pdfjs && pdfjs.numPages) ? pdfjs.numPages : dpPreviewTotal;
+    }
+
+    var page = await pdfjs.getPage(idx + 1);
+    var vp   = page.getViewport({ scale: 0.85 });
+
+    canvas.width = vp.width;
+    canvas.height = vp.height;
+
+    // Cancel previous render task if any (prevents "already rendering" issues)
+    if (dpPreviewRenderTask && dpPreviewRenderTask.cancel) {
+      try { dpPreviewRenderTask.cancel(); } catch(_) {}
+    }
+    dpPreviewRenderTask = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+    await dpPreviewRenderTask.promise;
+    dpPreviewRenderTask = null;
+
+    document.getElementById('delpage-preview-info').textContent = (idx + 1) + '/' + (dpPreviewTotal || 1);
+  } catch (e) {
+    console.warn('renderDpPreview error', e);
+  }
+}
+
+function prevDelpagePreview() { if (dpPreviewPage > 0) { dpPreviewPage--; renderDpPreview(dpPreviewPage); } }
+function nextDelpagePreview() { if (dpPreviewPage < dpPreviewTotal-1) { dpPreviewPage++; renderDpPreview(dpPreviewPage); } }
+function downloadDelpageFile() {
+  if (!dpResultBlob) return;
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(dpResultBlob);
+  a.download = 'deleted-pages-' + new Date().toISOString().split('T')[0] + '.pdf';
+  a.click();
+}
+
+// ============================================================
+//  INSERT PAGE NUMBER — ตัวแปรและฟังก์ชัน
+// ============================================================
+var pnPdfDoc      = null;
+var pnPdfBytes    = null;
+var pnPdfjsDoc     = null;
+var pnPdfjsLoading = null;
+var pnPdfjsRenderTask = null;
+
+var pnPreviewPdfjsDoc     = null;
+var pnPreviewPdfjsLoading = null;
+var pnPreviewRenderTask   = null;
+var pnTotal       = 0;
+var pnCurPage     = 0;
+var pnRelX        = 0.5;    // 0=ซ้าย 1=ขวา
+var pnRelY        = 0.05;   // 0=ล่าง 1=บน (PDF coord)
+var pnResultBlob  = null;
+var pnPreviewBytes  = null;
+var pnPreviewPage   = 0;
+var pnPreviewTotal  = 0;
+var PN_SCALE = 0.85;
+
+function initInsertPageNum() {
+  var fi = document.getElementById('pn-file');
+  var dz = document.getElementById('pn-drop-zone');
+  if (!fi || fi._pnInit) return;
+  fi._pnInit = true;
+
+  fi.addEventListener('change', function() { if (fi.files[0]) loadPnFile(fi.files[0]); });
+  dz.addEventListener('click', function(e) {
+    if (e && e.target && (e.target.closest && e.target.closest('button'))) return;
+    fi.click();
+  });
+  var _btn = dz.querySelector('button');
+  if (_btn && !_btn._pnStopBubble) { _btn._pnStopBubble = true; _btn.addEventListener('click', function(ev){ ev.stopPropagation(); }); }
+
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('dragover'); });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault(); dz.classList.remove('dragover');
+    var files = Array.from(e.dataTransfer.files || []).filter(function(f) { return f.type === 'application/pdf'; });
+    if (files[0]) loadPnFile(files[0]);
+  });
+
+  document.getElementById('pn-font').addEventListener('change', pnUpdateHandle);
+  var _cm = document.getElementById('pn-content-mode');
+  if (_cm) _cm.addEventListener('change', function(){ pnToggleCustomText(); pnUpdateHandle(); });
+  pnToggleCustomText();
+  setupPnDrag();
+}
+
+async function loadPnFile(file) {
+  try {
+    pnPdfBytes = new Uint8Array(await file.arrayBuffer());
+    pnPdfDoc   = await PDFLib.PDFDocument.load(pnPdfBytes);
+    pnTotal    = pnPdfDoc.getPageCount();
+    // Create and cache PDF.js document once (avoid ArrayBuffer detachment issues)
+    pnPdfjsDoc = null; pnPdfjsLoading = null; pnPdfjsRenderTask = null;
+    try {
+      var _pnBytesForPdfjs = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+      pnPdfjsLoading = pdfjsLib.getDocument({ data: _pnBytesForPdfjs });
+      pnPdfjsDoc = await pnPdfjsLoading.promise;
+    } catch(_e) {
+      try {
+        var _pnBytesForPdfjs2 = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+        pnPdfjsLoading = pdfjsLib.getDocument({ data: _pnBytesForPdfjs2, disableWorker: true });
+        pnPdfjsDoc = await pnPdfjsLoading.promise;
+      } catch(__e) {
+        console.warn('pnPdfjsDoc init failed', _e, __e);
+        throw _e;
+      }
+    }
+
+    pnCurPage  = 0;
+
+    document.getElementById('pn-drop-zone').classList.add('hidden');
+    document.getElementById('pn-preview-section').classList.remove('hidden');
+    document.getElementById('pn-result').classList.add('hidden');
+    document.getElementById('pn-apply-btn').disabled = false;
+    document.getElementById('pn-range-to').value = pnTotal;
+
+    await pnRenderPreviewPage(0);
+    await buildPnThumbnails();
+    setTimeout(pnUpdateHandle, 100);
+  } catch(e) {
+    alert('ไม่สามารถโหลด PDF ได้: ' + e.message);
+  }
+}
+
+async function pnRenderPreviewPage(idx) {
+  pnCurPage = idx;
+  var canvas = document.getElementById('pagenum-canvas');
+  // Use cached PDF.js document (prevents ArrayBuffer detached + enables smooth navigation)
+  var pdfjs = pnPdfjsDoc;
+  if (!pdfjs) {
+    try {
+      var _b = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+      pnPdfjsLoading = pdfjsLib.getDocument({ data: _b });
+      pnPdfjsDoc = pdfjs = await pnPdfjsLoading.promise;
+    } catch(_e) {
+      var _b2 = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+      pnPdfjsLoading = pdfjsLib.getDocument({ data: _b2, disableWorker: true });
+      pnPdfjsDoc = pdfjs = await pnPdfjsLoading.promise;
+    }
+  }
+  var page   = await pdfjs.getPage(idx + 1);
+  var vp     = page.getViewport({ scale: PN_SCALE });
+  canvas.width  = vp.width;
+  canvas.height = vp.height;
+  // Cancel previous render task (prevents stuck preview when switching pages quickly)
+  if (pnPdfjsRenderTask && pnPdfjsRenderTask.cancel) {
+    try { pnPdfjsRenderTask.cancel(); } catch(_) {}
+  }
+  pnPdfjsRenderTask = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+  await pnPdfjsRenderTask.promise;
+  pnPdfjsRenderTask = null;
+  document.getElementById('pn-page-nav').textContent = 'หน้า ' + (idx+1) + '/' + pnTotal;
+  setTimeout(pnUpdateHandle, 50);
+}
+
+function pnPrevPage() { if (pnCurPage > 0)          pnRenderPreviewPage(pnCurPage - 1); }
+function pnNextPage() { if (pnCurPage < pnTotal - 1) pnRenderPreviewPage(pnCurPage + 1); }
+
+/* ── Draggable handle ─── */
+function pnUpdateHandle() {
+  var canvas = document.getElementById('pagenum-canvas');
+  var handle = document.getElementById('pagenum-handle');
+  if (!canvas || !handle) return;
+
+  // Compose preview text (เลขหน้า / ข้อความ / ข้อความ+เลขหน้า)
+  var modeEl = document.getElementById('pn-content-mode');
+  var mode   = modeEl ? modeEl.value : 'num';
+  var customEl = document.getElementById('pn-custom-text');
+  var customText = customEl ? (customEl.value || '').trim() : '';
+
+  var startNum = parseInt(document.getElementById('pn-start').value || '1') || 1;
+  var numText  = pnFormatNum(pnCurPage + startNum, pnTotal);
+
+  var displayText = numText;
+  if (mode === 'text') displayText = customText || 'ข้อความ';
+  else if (mode === 'both') displayText = (customText || 'ข้อความ') + ' ' + numText;
+
+  var tspan = document.getElementById('pn-handle-text');
+  if (tspan) tspan.textContent = displayText;
+
+  var fnt   = document.getElementById('pn-font').value;
+  var sz    = document.getElementById('pn-size').value + 'px';
+  var color = document.getElementById('pn-color').value;
+  var bg    = document.getElementById('pn-bg-box') && document.getElementById('pn-bg-box').checked;
+
+  handle.style.fontFamily = "'" + fnt + "', 'Sarabun', Arial, sans-serif";
+  handle.style.fontSize   = sz;
+
+  // เอากรอบ/พื้นหลังของตัวอย่างออก (แสดงเฉพาะตัวอักษร)
+  handle.style.background = 'transparent';
+  handle.style.boxShadow  = 'none';
+  handle.style.border     = 'none';
+  handle.style.outline    = 'none';
+  handle.style.color      = color;
+
+  // คำนวณตำแหน่ง
+  var cw = canvas.offsetWidth  || canvas.width  || 500;
+  var ch = canvas.offsetHeight || canvas.height || 700;
+  var hw = handle.offsetWidth  || 60;
+  var hh = handle.offsetHeight || 24;
+
+  var left = pnRelX * cw - hw / 2;
+  var top  = (1 - pnRelY) * ch - hh / 2;
+  left = Math.max(0, Math.min(cw - hw, left));
+  top  = Math.max(0, Math.min(ch - hh, top));
+  handle.style.left = left + 'px';
+  handle.style.top  = top  + 'px';
+}
+
+function hexToHsl(hex) {
+  var r = parseInt(hex.slice(1,3),16)/255;
+  var g = parseInt(hex.slice(3,5),16)/255;
+  var b = parseInt(hex.slice(5,7),16)/255;
+  var max = Math.max(r,g,b), min = Math.min(r,g,b);
+  var l = (max+min)/2*100;
+  return { l: l };
+}
+
+function setupPnDrag() {
+  var handle = document.getElementById('pagenum-handle');
+  if (!handle) return;
+  var dragging = false, sx, sy, origL, origT;
+
+  function onStart(cx, cy) {
+    dragging = true; sx = cx; sy = cy;
+    origL = parseFloat(handle.style.left) || 0;
+    origT = parseFloat(handle.style.top)  || 0;
+    handle.classList.add('pn-dragging');
+  }
+  function onMove(cx, cy) {
+    if (!dragging) return;
+    var canvas = document.getElementById('pagenum-canvas');
+    var cw = canvas.offsetWidth  || canvas.width;
+    var ch = canvas.offsetHeight || canvas.height;
+    var hw = handle.offsetWidth; var hh = handle.offsetHeight;
+    var nl = Math.max(0, Math.min(cw-hw, origL + cx - sx));
+    var nt = Math.max(0, Math.min(ch-hh, origT + cy - sy));
+    handle.style.left = nl + 'px';
+    handle.style.top  = nt + 'px';
+    pnRelX = (nl + hw/2) / cw;
+    pnRelY = 1 - (nt + hh/2) / ch;
+  }
+  function onEnd() { dragging = false; handle.classList.remove('pn-dragging'); }
+
+  handle.addEventListener('mousedown',  function(e) { onStart(e.clientX, e.clientY); e.preventDefault(); });
+  document.addEventListener('mousemove',function(e) { onMove(e.clientX, e.clientY); });
+  document.addEventListener('mouseup',  onEnd);
+  handle.addEventListener('touchstart', function(e) { onStart(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }, { passive: false });
+  document.addEventListener('touchmove',function(e) { if(dragging){ onMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, { passive: false });
+  document.addEventListener('touchend', onEnd);
+}
+
+function pnFormatNum(n, total) {
+  var fmt = (document.getElementById('pn-format') || {}).value || 'n';
+  switch(fmt) {
+    case 'n':       return String(n);
+    case 'n/N':     return n + '/' + total;
+    case 'Page n':  return 'Page ' + n;
+    case 'Page n/N':return 'Page ' + n + '/' + total;
+    case 'หน้า n':  return 'หน้า ' + n;
+    case 'หน้า n/N':return 'หน้า ' + n + '/' + total;
+    case '- n -':   return '- ' + n + ' -';
+    default: return String(n);
+  }
+}
+
+function pnSetPresetPos(rx, ry, btn) {
+  pnRelX = rx; pnRelY = ry;
+  document.querySelectorAll('.pn-pos-btn').forEach(function(b) { b.classList.remove('pn-active'); });
+  if (btn) btn.classList.add('pn-active');
+  pnUpdateHandle();
+}
+
+function pnSwitchTab(tab) {
+  document.getElementById('pn-tab-preview-content').classList.toggle('hidden', tab !== 'preview');
+  document.getElementById('pn-tab-thumbs-content').classList.toggle('hidden', tab !== 'thumbs');
+  document.getElementById('pn-tab-preview-btn').classList.toggle('pn-tab-active', tab === 'preview');
+  document.getElementById('pn-tab-thumbs-btn').classList.toggle('pn-tab-active', tab === 'thumbs');
+}
+
+function pnToggleRange() {
+  var scope = document.getElementById('pn-pages-scope').value;
+  document.getElementById('pn-range-inputs').classList.toggle('hidden', scope !== 'range');
+}
+
+function pnToggleCustomText() {
+  var modeEl = document.getElementById('pn-content-mode');
+  var wrap = document.getElementById('pn-custom-text-wrap');
+  if (!wrap) return;
+  var mode = modeEl ? modeEl.value : 'num';
+  wrap.classList.toggle('hidden', mode === 'num');
+}
+
+
+async function buildPnThumbnails() {
+  var grid  = document.getElementById('pn-thumbs-grid');
+  grid.innerHTML = '';
+  var pdfjs = pnPdfjsDoc;
+  if (!pdfjs) {
+    try {
+      var _b = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+      pnPdfjsLoading = pdfjsLib.getDocument({ data: _b });
+      pnPdfjsDoc = pdfjs = await pnPdfjsLoading.promise;
+    } catch(_e) {
+      var _b2 = (pnPdfBytes && pnPdfBytes.slice) ? pnPdfBytes.slice() : new Uint8Array(pnPdfBytes);
+      pnPdfjsLoading = pdfjsLib.getDocument({ data: _b2, disableWorker: true });
+      pnPdfjsDoc = pdfjs = await pnPdfjsLoading.promise;
+    }
+  }
+
+  for (var i = 0; i < pnTotal; i++) {
+    var page = await pdfjs.getPage(i + 1);
+    var vp   = page.getViewport({ scale: 0.42 });
+    var cv   = document.createElement('canvas');
+    cv.width = vp.width; cv.height = vp.height;
+    await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+
+    var wrap  = document.createElement('div');
+    wrap.className = 'pn-thumb-wrap';
+
+    var img = document.createElement('img');
+    img.src = cv.toDataURL('image/jpeg', 0.7);
+
+    var badge = document.createElement('div');
+    badge.className = 'pn-thumb-badge';
+    badge.textContent = i + 1;
+
+    wrap.appendChild(img); wrap.appendChild(badge);
+    (function(idx) {
+      wrap.addEventListener('click', function() { pnSwitchTab('preview'); pnRenderPreviewPage(idx); });
+    })(i);
+    grid.appendChild(wrap);
+  }
+}
+
+/* ── render page-number image on canvas → PNG dataURL ── */
+async function renderPageNumImage(text, fontFamily, fontSize, hexColor, withBg) {
+  var fontStr = 'bold ' + fontSize + "px '" + fontFamily + "', 'Sarabun', Arial, sans-serif";
+  try { await document.fonts.load(fontStr); } catch(e) {}
+
+  var pad = Math.ceil(fontSize * 0.4);
+  var cv  = document.createElement('canvas');
+  var ctx = cv.getContext('2d');
+  ctx.font = fontStr;
+  var tw  = Math.ceil(ctx.measureText(text).width) + pad * 2;
+  var th  = Math.ceil(fontSize * 1.4) + pad;
+  cv.width  = Math.max(tw, 24);
+  cv.height = Math.max(th, 18);
+  ctx.clearRect(0, 0, cv.width, cv.height);
+
+  if (withBg) {
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(0,0,cv.width,cv.height,5);
+    else ctx.rect(0,0,cv.width,cv.height);
+    ctx.fill();
+  }
+
+  ctx.font         = fontStr;
+  ctx.fillStyle    = hexColor;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign    = 'left';
+  ctx.fillText(text, pad, cv.height / 2);
+  return cv.toDataURL('image/png');
+}
+
+async function executeInsertPageNum() {
+  if (!pnPdfDoc) return;
+  var prog = document.getElementById('pn-progress');
+  var bar  = document.getElementById('pn-progress-bar');
+  var txt  = document.getElementById('pn-progress-text');
+  prog.classList.remove('hidden');
+  document.getElementById('pn-result').classList.add('hidden');
+
+  try {
+    var newPdf = await PDFLib.PDFDocument.create();
+    var copied = await newPdf.copyPages(pnPdfDoc, pnPdfDoc.getPageIndices());
+    copied.forEach(function(p) { newPdf.addPage(p); });
+
+    var fnt      = document.getElementById('pn-font').value;
+    var sz       = parseInt(document.getElementById('pn-size').value) || 14;
+    var color    = document.getElementById('pn-color').value;
+    var startNum = parseInt(document.getElementById('pn-start').value) || 1;
+    var scope    = document.getElementById('pn-pages-scope').value;
+    var withBg   = document.getElementById('pn-bg-box').checked;
+    var rfrom    = parseInt(document.getElementById('pn-range-from').value) || 1;
+    var rto      = parseInt(document.getElementById('pn-range-to').value)   || pnTotal;
+
+    var modeEl  = document.getElementById('pn-content-mode');
+    var mode    = modeEl ? modeEl.value : 'num';
+    var customEl = document.getElementById('pn-custom-text');
+    var customText = customEl ? (customEl.value || '').trim() : '';
+    if ((mode === 'text' || mode === 'both') && !customText) {
+      alert('กรุณาใส่ข้อความก่อนดำเนินการ');
+      prog.classList.add('hidden');
+      return;
+    }
+
+
+    function shouldNum(idx) {
+      var pg = idx + 1;
+      if (scope === 'all')   return true;
+      if (scope === 'odd')   return pg % 2 === 1;
+      if (scope === 'even')  return pg % 2 === 0;
+      if (scope === 'from2') return pg >= 2;
+      if (scope === 'range') return pg >= rfrom && pg <= rto;
+      return true;
+    }
+
+    bar.style.width = '10%'; txt.textContent = '10%';
+    var counter = startNum;
+
+    for (var i = 0; i < pnTotal; i++) {
+      var pct = 10 + Math.round((i / pnTotal) * 85);
+      bar.style.width = pct + '%'; txt.textContent = pct + '%';
+
+      if (!shouldNum(i)) { counter++; continue; }
+
+      var page    = newPdf.getPage(i);
+      var pageSize = page.getSize();
+      var pageW   = pageSize.width;
+      var pageH   = pageSize.height;
+
+      var numText  = pnFormatNum(counter, pnTotal);
+      var overlayText = numText;
+      if (mode === 'text') overlayText = customText;
+      else if (mode === 'both') overlayText = customText + ' ' + numText;
+      var imgData  = await renderPageNumImage(overlayText, fnt, sz, color, withBg);
+      var embed;
+      try { embed = await newPdf.embedPng(imgData); } catch(e) { counter++; continue; }
+
+      var imgW = embed.width;
+      var imgH = embed.height;
+
+      // PDF coord: (0,0)=bottom-left; Y increases upward
+      // pnRelX: 0=left edge, 1=right edge
+      // pnRelY: 0=bottom, 1=top  → ตรงกับ PDF natural coords
+      var pdfX = pnRelX * pageW - imgW * pnRelX;
+      var pdfY = pnRelY * pageH - imgH * pnRelY;
+      pdfX = Math.max(0, Math.min(pageW - imgW, pdfX));
+      pdfY = Math.max(0, Math.min(pageH - imgH, pdfY));
+
+      page.drawImage(embed, { x: pdfX, y: pdfY, width: imgW, height: imgH });
+      counter++;
+      await new Promise(function(r) { setTimeout(r, 0); });
+    }
+
+    bar.style.width = '100%'; txt.textContent = '100%';
+    var bytes = await newPdf.save();
+    pnResultBlob   = new Blob([bytes], { type: 'application/pdf' });
+    pnPreviewBytes = (bytes && bytes.slice) ? bytes.slice() : new Uint8Array(bytes);
+    pnPreviewPdfjsDoc = null; pnPreviewPdfjsLoading = null; pnPreviewRenderTask = null;
+    try {
+      var _pnResBytes = (pnPreviewBytes && pnPreviewBytes.slice) ? pnPreviewBytes.slice() : new Uint8Array(pnPreviewBytes);
+      pnPreviewPdfjsLoading = pdfjsLib.getDocument({ data: _pnResBytes });
+      pnPreviewPdfjsDoc = await pnPreviewPdfjsLoading.promise;
+    } catch(_e) {
+      try {
+        var _pnResBytes2 = (pnPreviewBytes && pnPreviewBytes.slice) ? pnPreviewBytes.slice() : new Uint8Array(pnPreviewBytes);
+        pnPreviewPdfjsLoading = pdfjsLib.getDocument({ data: _pnResBytes2, disableWorker: true });
+        pnPreviewPdfjsDoc = await pnPreviewPdfjsLoading.promise;
+      } catch(__e) {
+        console.warn('pnPreviewPdfjsDoc init failed', _e, __e);
+        // let renderPnResultPreview try again
+      }
+    }
+    pnPreviewPage  = 0;
+    pnPreviewTotal = pnTotal;
+
+    setTimeout(async function() {
+      prog.classList.add('hidden');
+      document.getElementById('pn-result').classList.remove('hidden');
+      document.getElementById('pn-result-text').textContent =
+        'เพิ่มเลขหน้าสำเร็จ! ทั้งหมด ' + pnTotal + ' หน้า';
+      await renderPnResultPreview(0);
+    }, 400);
+
+  } catch(e) {
+    alert('เกิดข้อผิดพลาด: ' + e.message);
+    prog.classList.add('hidden');
+  }
+}
+
+async function renderPnResultPreview(idx) {
+  var canvas = document.getElementById('pn-result-canvas');
+  // Use cached PDF.js document for result preview (prevents ArrayBuffer detached + enables smooth navigation)
+  var pdfjs = pnPreviewPdfjsDoc;
+  if (!pdfjs) {
+    try {
+      var _b = (pnPreviewBytes && pnPreviewBytes.slice) ? pnPreviewBytes.slice() : new Uint8Array(pnPreviewBytes);
+      pnPreviewPdfjsLoading = pdfjsLib.getDocument({ data: _b });
+      pnPreviewPdfjsDoc = pdfjs = await pnPreviewPdfjsLoading.promise;
+    } catch(_e) {
+      var _b2 = (pnPreviewBytes && pnPreviewBytes.slice) ? pnPreviewBytes.slice() : new Uint8Array(pnPreviewBytes);
+      pnPreviewPdfjsLoading = pdfjsLib.getDocument({ data: _b2, disableWorker: true });
+      pnPreviewPdfjsDoc = pdfjs = await pnPreviewPdfjsLoading.promise;
+    }
+  }
+  var page   = await pdfjs.getPage(idx + 1);
+  var vp     = page.getViewport({ scale: 0.85 });
+  canvas.width = vp.width; canvas.height = vp.height;
+  // Cancel previous render task (prevents stuck preview when switching pages quickly)
+  if (pnPreviewRenderTask && pnPreviewRenderTask.cancel) {
+    try { pnPreviewRenderTask.cancel(); } catch(_) {}
+  }
+  pnPreviewRenderTask = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+  await pnPreviewRenderTask.promise;
+  pnPreviewRenderTask = null;
+  document.getElementById('pn-preview-info').textContent = (idx+1) + '/' + pnPreviewTotal;
+}
+
+function prevPnPreview() { if (pnPreviewPage > 0)              { pnPreviewPage--; renderPnResultPreview(pnPreviewPage); } }
+function nextPnPreview() { if (pnPreviewPage < pnPreviewTotal-1){ pnPreviewPage++; renderPnResultPreview(pnPreviewPage); } }
+
+function downloadPnFile() {
+  if (!pnResultBlob) return;
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(pnResultBlob);
+  a.download = 'page-numbered-' + new Date().toISOString().split('T')[0] + '.pdf';
+  a.click();
+}
+
+function pnReset() {
+  pnPdfDoc = pnPdfBytes = pnResultBlob = pnPreviewBytes = null;
+  // Clear cached PDF.js documents/tasks
+  try { if (pnPdfjsLoading && pnPdfjsLoading.destroy) pnPdfjsLoading.destroy(); } catch(_) {}
+  try { if (pnPreviewPdfjsLoading && pnPreviewPdfjsLoading.destroy) pnPreviewPdfjsLoading.destroy(); } catch(_) {}
+  pnPdfjsDoc = null; pnPdfjsLoading = null;
+  pnPreviewPdfjsDoc = null; pnPreviewPdfjsLoading = null;
+  if (pnPdfjsRenderTask && pnPdfjsRenderTask.cancel) { try { pnPdfjsRenderTask.cancel(); } catch(_) {} }
+  if (pnPreviewRenderTask && pnPreviewRenderTask.cancel) { try { pnPreviewRenderTask.cancel(); } catch(_) {} }
+  pnPdfjsRenderTask = null; pnPreviewRenderTask = null;
+  pnTotal = pnCurPage = pnPreviewPage = pnPreviewTotal = 0;
+  document.getElementById('pn-drop-zone').classList.remove('hidden');
+  document.getElementById('pn-preview-section').classList.add('hidden');
+  document.getElementById('pn-result').classList.add('hidden');
+  document.getElementById('pn-apply-btn').disabled = true;
+  document.getElementById('pn-file').value = '';
+  document.getElementById('pn-thumbs-grid').innerHTML = '';
+}
+
+// --- Expose add-on functions explicitly (prevents scope/CSP edge cases) ---
+window.initDeletePage = initDeletePage;
+window.executeDeletePage = executeDeletePage;
+window.downloadDelpageFile = downloadDelpageFile;
+window.prevDelpagePreview = prevDelpagePreview;
+window.nextDelpagePreview = nextDelpagePreview;
+
+window.initInsertPageNum = initInsertPageNum;
+window.pnApply = pnApply;
+window.prevPnPreview = prevPnPreview;
+window.nextPnPreview = nextPnPreview;
+window.downloadPnFile = downloadPnFile;
+window.pnReset = pnReset;
+
+</script>
 </body>
 </html>
-
