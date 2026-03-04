@@ -1623,5 +1623,217 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 </script>
+
+
+<!-- OAE Usage Audit (Google Sheets / Apps Script) -->
+<script>
+/**
+ * OAE Usage Audit (client-side) — safe telemetry
+ * - Works on GitHub Pages / Vercel static hosting
+ * - Sends events to Google Apps Script Web App (/exec)
+ * - Does NOT send file names, document content, or QR payloads
+ *
+ * IMPORTANT: Replace the placeholder below with your Apps Script Web App URL (ends with /exec)
+ * Example:
+ *   window.OAE_AUDIT_ENDPOINT = "https://script.google.com/macros/s/XXXX/exec";
+ */
+(function () {
+  if (typeof window.OAE_AUDIT_ENDPOINT === 'undefined') {
+    window.OAE_AUDIT_ENDPOINT = "PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
+  }
+
+  const TZ = "Asia/Bangkok";
+
+  function getDayBkk(d) {
+    d = d || new Date();
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: TZ,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(d);
+      const y = parts.find(p => p.type === "year").value;
+      const m = parts.find(p => p.type === "month").value;
+      const da = parts.find(p => p.type === "day").value;
+      return y + "-" + m + "-" + da;
+    } catch (e) {
+      // Fallback (UTC)
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
+  function readLS(key) {
+    try { return localStorage.getItem(key) || ""; } catch (e) { return ""; }
+  }
+  function writeLS(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) {}
+  }
+  function readSS(key) {
+    try { return sessionStorage.getItem(key) || ""; } catch (e) { return ""; }
+  }
+  function writeSS(key, val) {
+    try { sessionStorage.setItem(key, val); } catch (e) {}
+  }
+
+  function normEndpoint(ep) {
+    ep = (ep || "").trim();
+    if (!ep) return "";
+    if (ep.indexOf("PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE") !== -1) return "";
+    if (ep.indexOf("PASTE_") === 0) return "";
+    return ep;
+  }
+
+  function getEndpoint() {
+    const qs = new URLSearchParams(location.search);
+    const epQS = normEndpoint(qs.get("audit_endpoint") || "");
+    if (epQS) writeLS("oae_audit_endpoint", epQS);
+
+    const ep1 = normEndpoint(String(window.OAE_AUDIT_ENDPOINT || ""));
+    const ep2 = normEndpoint(readLS("oae_audit_endpoint"));
+    return ep1 || ep2 || epQS || "";
+  }
+
+  const endpoint = getEndpoint();
+
+  function uuidFallback() {
+    return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+  }
+
+  const visitorId = (function () {
+    let v = readLS("oae_vid");
+    if (!v) {
+      try { v = (crypto && crypto.randomUUID) ? crypto.randomUUID() : uuidFallback(); }
+      catch (e) { v = uuidFallback(); }
+      writeLS("oae_vid", v);
+    }
+    return v || "anon";
+  })();
+
+  const sessionId = (function () {
+    let s = readSS("oae_sid");
+    if (!s) {
+      try { s = (crypto && crypto.randomUUID) ? crypto.randomUUID() : uuidFallback(); }
+      catch (e) { s = uuidFallback(); }
+      writeSS("oae_sid", s);
+    }
+    return s || "session";
+  })();
+
+  function send(eventName, payload) {
+    if (!endpoint) return;
+
+    payload = payload || {};
+    const body = {
+      ts_iso: new Date().toISOString(),
+      day_bkk: getDayBkk(),
+      site: location.origin || "",
+      path: location.pathname || "",
+      page: document.title || "",
+      event: String(eventName || ""),
+      action: String(payload.action || ""),
+      tool: String(payload.tool || ""),
+      fn: String(payload.fn || ""),
+      visitor_id: visitorId,
+      session_id: sessionId,
+      referrer: document.referrer || "",
+      ua: navigator.userAgent || "",
+      extra: payload.extra ? payload.extra : null
+    };
+
+    // Prefer sendBeacon (non-blocking, good for unload)
+    try {
+      const blob = new Blob([JSON.stringify(body)], { type: "text/plain" });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(endpoint, blob);
+        return;
+      }
+    } catch (e) {}
+
+    // Fallback fetch
+    try {
+      fetch(endpoint, { method: "POST", body: JSON.stringify(body), keepalive: true }).catch(function(){});
+    } catch (e) {}
+  }
+
+  // expose small API
+  window.OAE_AUDIT = {
+    endpoint: endpoint,
+    visitorId: visitorId,
+    sessionId: sessionId,
+    send: send
+  };
+
+  // page view
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      send("page_view", { action: "view" });
+    }, { once: true });
+  } else {
+    send("page_view", { action: "view" });
+  }
+
+  // wrap functions safely (no structural changes)
+  function wrapFn(fnName, eventName, mapper) {
+    try {
+      const orig = window[fnName];
+      if (typeof orig !== "function") return;
+      if (orig.__oae_wrapped) return;
+
+      function wrapped() {
+        try {
+          const info = mapper ? mapper.apply(this, arguments) : {};
+          info = info || {};
+          info.fn = fnName;
+          send(eventName, info);
+        } catch (e) {}
+        return orig.apply(this, arguments);
+      }
+
+      wrapped.__oae_wrapped = true;
+      window[fnName] = wrapped;
+    } catch (e) {}
+  }
+
+  // PDF Tool page (tool switch)
+  wrapFn("openTool", "tool_open", function (toolId) {
+    return { tool: String(toolId || "") };
+  });
+
+  // QR / Index page (tool switch)
+  wrapFn("showPdfTool", "tool_open", function (toolId) {
+    return { tool: String(toolId || "") };
+  });
+
+  // Common actions (if present)
+  wrapFn("mergePDFs", "action", function () { return { action: "merge_pdfs" }; });
+  wrapFn("splitPDF", "action", function () { return { action: "split_pdf" }; });
+  wrapFn("shortenURL", "action", function () { return { action: "shorten_url" }; });
+
+  // JS errors
+  window.addEventListener("error", function (e) {
+    try {
+      send("js_error", {
+        action: "error",
+        extra: {
+          message: String(e.message || ""),
+          source: String(e.filename || ""),
+          line: Number(e.lineno || 0),
+          col: Number(e.colno || 0)
+        }
+      });
+    } catch (_) {}
+  });
+
+  window.addEventListener("unhandledrejection", function (e) {
+    try {
+      const r = (e && e.reason) ? (e.reason.message || e.reason) : "unknown";
+      send("promise_rejection", { action: "rejection", extra: { reason: String(r) } });
+    } catch (_) {}
+  });
+
+})();
+</script>
+
 </body>
 </html>
