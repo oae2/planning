@@ -554,15 +554,22 @@
 
       // ป้องกันการเลือกข้อความ (ยกเว้นใน input/textarea และ element ที่จำเป็น)
       document.addEventListener('selectstart', function(e) {
-        if (!['INPUT', 'TEXTAREA', 'BUTTON'].includes(e.target.tagName) && 
-            !e.target.closest('[contenteditable]') &&
-            !e.target.closest('.allow-select')) {
+        // e.target อาจเป็น Text node/Document (ไม่มี closest) ในบางกรณี
+        const t = e.target;
+        const el = (t && t.nodeType === 1) ? t : (t && t.parentElement ? t.parentElement : null);
+        if (!el) return; // ถ้าระบุ element ไม่ได้ ให้ไม่บล็อก (เลี่ยง error)
+
+        const tag = el.tagName || '';
+        const isAllowed =
+          ['INPUT', 'TEXTAREA', 'BUTTON'].includes(tag) ||
+          (typeof el.closest === 'function' && (el.closest('[contenteditable]') || el.closest('.allow-select')));
+
+        if (!isAllowed) {
           e.preventDefault();
           return false;
         }
       });
-
-      // ป้องกันการลากเฉพาะรูปภาพ
+// ป้องกันการลากเฉพาะรูปภาพ
       document.addEventListener('dragstart', function(e) {
         if (e.target.tagName === 'IMG') {
           e.preventDefault();
@@ -632,6 +639,22 @@
     }
 
     // QR Code Functions
+
+    // Normalize QR payload for best scanner compatibility.
+    // For URLs containing Thai/non-ASCII characters, convert to a fully percent-encoded ASCII URL.
+    function normalizeQrPayload(input) {
+      const s = String(input || '').trim();
+      if (/^https?:\/\//i.test(s)) {
+        try {
+          // URL().href returns a normalized, percent-encoded URL (ASCII-safe)
+          return new URL(s).href;
+        } catch (e) {
+          // Fallback: encodeURI keeps protocol/slashes but percent-encodes non-ASCII
+          return encodeURI(s);
+        }
+      }
+      return s;
+    }
     
     async function generateQR() {
       const text = document.getElementById("qrText").value.trim();
@@ -644,6 +667,9 @@
 
       if (!text) return alert("กรุณากรอกข้อความก่อน");
 
+      // Normalize payload (important for Thai/non-ASCII URLs)
+      const payload = normalizeQrPayload(text);
+
       // Clear previous QR
       if (qr) {
         document.getElementById("qrContainer").innerHTML = "";
@@ -653,10 +679,16 @@
       const EXPORT_SCALE = 4;
       const renderSize = size * EXPORT_SCALE;
 
+      // Error correction: prefer capacity for very long URLs, but raise for QR-with-logo.
+      const ecl = logoImage ? 'H' : (payload.length > 250 ? 'L' : 'M');
+
       const qrConfig = {
         width: renderSize,
         height: renderSize,
-        data: text,
+        data: payload,
+        qrOptions: {
+          errorCorrectionLevel: ecl
+        },
         dotsOptions: {
           color: color,
           type: style
@@ -1639,7 +1671,7 @@ document.addEventListener("DOMContentLoaded", function () {
  */
 (function () {
   if (typeof window.OAE_AUDIT_ENDPOINT === 'undefined') {
-    window.OAE_AUDIT_ENDPOINT = "https://script.google.com/macros/s/AKfycbyCVt5Rn6TBzb2vwtTxNS4dH53P1LQOTeGhpJta4DE-INRk7n5yeR7OBvRe-a9Wlafw/exec";
+    window.OAE_AUDIT_ENDPOINT = "PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
   }
 
   const TZ = "Asia/Bangkok";
@@ -1837,5 +1869,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
-
-
