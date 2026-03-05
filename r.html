@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Redirect...</title>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; margin:24px; color:#111}
+    .box{max-width:720px; margin:auto; padding:16px 18px; border:1px solid #e5e7eb; border-radius:12px}
+    .muted{color:#6b7280; font-size:14px}
+    code{word-break:break-all}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1 style="margin:0 0 8px 0; font-size:18px;">กำลังเปิดลิงก์…</h1>
+    <div class="muted" id="msg">โปรดรอสักครู่</div>
+    <div class="muted" style="margin-top:10px;">หากไม่ไปอัตโนมัติ ให้เปิดลิงก์ด้านล่าง:</div>
+    <p><a id="a" href="#" rel="noreferrer noopener" target="_self"><code id="c"></code></a></p>
+  </div>
+
+<script>
+(function(){
+  function fail(s){
+    document.getElementById('msg').textContent = s;
+  }
+  const hash = (location.hash || '').replace(/^#/, '');
+  if (!hash) return fail('ไม่พบข้อมูลลิงก์ใน QR');
+  if (typeof LZString === 'undefined' || !LZString.decompressFromEncodedURIComponent) {
+    return fail('ไม่พบไลบรารีสำหรับถอดรหัสลิงก์');
+  }
+  let url = '';
+  try {
+    url = LZString.decompressFromEncodedURIComponent(hash) || '';
+  } catch(e) {}
+  if (!url) return fail('ถอดรหัสลิงก์ไม่สำเร็จ');
+
+  // Basic safety: only allow http(s)
+  if (!/^https?:\/\//i.test(url)) return fail('รูปแบบลิงก์ไม่ถูกต้อง');
+
+  const a = document.getElementById('a');
+  const c = document.getElementById('c');
+  a.href = url;
+  c.textContent = url;
+
+  // Redirect now
+  try { location.replace(url); } catch(e) { a.click(); }
+})();
+</script>
+</body>
+</html>
