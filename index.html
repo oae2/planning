@@ -38,6 +38,7 @@
       user-drag: none;
     }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 </head>
 <body class="flex bg-gray-100 h-screen">
 <!-- ปุ่ม Hamburger สำหรับมือถือ -->
@@ -652,7 +653,49 @@
           // Fallback: encodeURI keeps protocol/slashes but percent-encodes non-ASCII
           return encodeURI(s);
         }
+
+
+    // ===== Local "no-server" short link (redirect via r.html#<compressed>) =====
+    const AUTO_SHORT_MIN_LEN = 120; // shorten automatically when URL gets too long (QR becomes dense)
+
+    function getRedirectBaseUrl() {
+      try {
+        // resolves correctly even on GitHub Pages subpaths and ignores current #hash
+        return new URL('r.html', window.location.href).toString().split('#')[0];
+      } catch (e) {
+        // fallback: same directory
+        const base = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+        return base + 'r.html';
       }
+    }
+
+    function makeLocalShortLink(longUrl) {
+      const url = normalizeQrPayload(longUrl);
+      if (!/^https?:\/\//i.test(url)) return url;
+      if (typeof LZString === 'undefined' || typeof LZString.compressToEncodedURIComponent !== 'function') return url;
+      const compressed = LZString.compressToEncodedURIComponent(url);
+      if (!compressed) return url;
+      return getRedirectBaseUrl() + '#' + compressed;
+    }
+
+    function maybeAutoShortenPayload(payload) {
+      try {
+        if (!/^https?:\/\//i.test(payload)) return payload;
+        if (payload.length < AUTO_SHORT_MIN_LEN) return payload;
+        const shortUrl = makeLocalShortLink(payload);
+        // show hint (optional UI)
+        const hint = document.getElementById('autoShortHint');
+        if (hint && shortUrl !== payload) {
+          hint.classList.remove('hidden');
+          hint.textContent = '✅ ใช้ลิงก์ย่ออัตโนมัติแล้ว: ' + shortUrl;
+        }
+        return shortUrl;
+      } catch (e) {
+        return payload;
+      }
+    }
+
+}
       return s;
     }
     
@@ -668,7 +711,8 @@
       if (!text) return alert("กรุณากรอกข้อความก่อน");
 
       // Normalize payload (important for Thai/non-ASCII URLs)
-      const payload = normalizeQrPayload(text);
+      let payload = normalizeQrPayload(text);
+      payload = maybeAutoShortenPayload(payload);
 
       // Clear previous QR
       if (qr) {
@@ -874,22 +918,9 @@ function downloadQR(format = 'png') {
     }
 
     async function createAutoShortURL(longUrl) {
-      // Try real ultra-short services first
-      const realAPIs = [
-        {
-          name: "TinyURL",
-          url: `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`,
-          method: "GET",
-          parser: (response) => response.text(),
-          isReal: true
-        },
-        {
-          name: "is.gd", 
-          url: `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
-          method: "GET",
-          parser: (response) => response.text(),
-          isReal: true
-        }
+      // No-server short link: redirect via r.html#<compressed>
+      return makeLocalShortLink(longUrl);
+    }
       ];
 
       // Try real APIs first
@@ -922,16 +953,9 @@ function downloadQR(format = 'png') {
     }
 
     async function createCustomShortURL(longUrl, customCode) {
-      // Try TinyURL with custom alias first
-      try {
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}&alias=${customCode}`, {
-          mode: 'cors'
-        });
-        const result = await response.text();
-        if (result.startsWith('http') && !result.includes('Error')) {
-          updateLinkStatus(true);
-          return result;
-        }
+      // Custom code requires a database/backend; fallback to local short link.
+      return makeLocalShortLink(longUrl);
+    }
       } catch (error) {
         console.error("Custom TinyURL failed:", error);
       }
@@ -942,16 +966,9 @@ function downloadQR(format = 'png') {
     }
 
     async function createReadableShortURL(longUrl) {
-      // Try TinyURL first
-      try {
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`, {
-          mode: 'cors'
-        });
-        const result = await response.text();
-        if (result.startsWith('http')) {
-          updateLinkStatus(true);
-          return result;
-        }
+      // Same as auto in no-server mode
+      return makeLocalShortLink(longUrl);
+    }
       } catch (error) {
         // Fallback to mock readable URL
       }
