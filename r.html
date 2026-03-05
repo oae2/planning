@@ -25,15 +25,25 @@
   function fail(s){
     document.getElementById('msg').textContent = s;
   }
+  const params = new URLSearchParams(location.search || '');
+  const q = params.get('u') || '';
   const hash = (location.hash || '').replace(/^#/, '');
-  if (!hash) return fail('ไม่พบข้อมูลลิงก์ใน QR');
+
+  if (!hash && !q) return fail('ไม่พบข้อมูลลิงก์ใน QR');
+
   if (typeof LZString === 'undefined' || !LZString.decompressFromEncodedURIComponent) {
     return fail('ไม่พบไลบรารีสำหรับถอดรหัสลิงก์');
   }
   let url = '';
-  try {
-    url = LZString.decompressFromEncodedURIComponent(hash) || '';
-  } catch(e) {}
+  if (q) {
+    try { url = decodeURIComponent(q); } catch(e) { url = q; }
+  }
+
+  if (!url) {
+    try {
+      url = LZString.decompressFromEncodedURIComponent(hash) || '';
+    } catch(e) {}
+  }
   if (!url) return fail('ถอดรหัสลิงก์ไม่สำเร็จ');
 
   // Basic safety: only allow http(s)
