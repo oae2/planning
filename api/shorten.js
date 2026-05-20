@@ -36,30 +36,7 @@ export default async function handler(req, res) {
 
   const errors = [];
 
-  // ── 1. TinyURL ─────────────────────────────────────────────
-  // redirect โดยตรง ไม่มีหน้าโฆษณาคั่น รองรับ Google Drive URL
-  try {
-    const tinyRes = await fetch(
-      `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cleanedUrl)}`,
-      {
-        headers: { 'User-Agent': 'Mozilla/5.0 OAE-URL-Shortener/1.0' },
-        signal: AbortSignal.timeout(8000)
-      }
-    );
-    if (tinyRes.ok) {
-      const text = (await tinyRes.text()).trim();
-      if (text.startsWith('http') && text.includes('tinyurl.com')) {
-        return res.status(200).json({ shortUrl: text, service: 'TinyURL' });
-      }
-      errors.push(`TinyURL: ${text.substring(0, 80)}`);
-    } else {
-      errors.push(`TinyURL: HTTP ${tinyRes.status}`);
-    }
-  } catch (e) {
-    errors.push(`TinyURL: ${e.message}`);
-  }
-
-  // ── 2. v.gd ────────────────────────────────────────────────
+  // ── 1. v.gd ────────────────────────────────────────────────
   try {
     let vgdUrl = `https://v.gd/create.php?format=simple&url=${encodeURIComponent(cleanedUrl)}`;
     if (alias) vgdUrl += `&shorturl=${encodeURIComponent(alias)}`;
@@ -81,7 +58,7 @@ export default async function handler(req, res) {
     errors.push(`v.gd: ${e.message}`);
   }
 
-  // ── 3. is.gd ───────────────────────────────────────────────
+  // ── 2. is.gd ───────────────────────────────────────────────
   try {
     let isgdUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(cleanedUrl)}`;
     if (alias) isgdUrl += `&shorturl=${encodeURIComponent(alias)}`;
