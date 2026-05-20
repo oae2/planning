@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
 <meta charset="utf-8"/>
@@ -11,40 +10,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- Security Protection CSS -->
 <style>
-    /* ป้องกันการเลือกข้อความ (เฉพาะส่วนที่ไม่จำเป็น) */
     .no-select {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
     }
-    
-    /* อนุญาตการเลือกในช่อง input และ textarea */
     input, textarea, [contenteditable="true"], button {
-      -webkit-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-      user-select: text;
+      -webkit-user-select: text; -moz-user-select: text;
+      -ms-user-select: text; user-select: text;
     }
-    
-    /* ป้องกันการ drag & drop ภาพ */
     img {
-      -webkit-user-drag: none;
-      -khtml-user-drag: none;
-      -moz-user-drag: none;
-      -o-user-drag: none;
-      user-drag: none;
+      -webkit-user-drag: none; -khtml-user-drag: none;
+      -moz-user-drag: none; -o-user-drag: none; user-drag: none;
     }
-  </style>
+</style>
 </head>
 <body class="flex bg-gray-100 h-screen">
-<!-- ปุ่ม Hamburger สำหรับมือถือ -->
 <button class="fixed top-4 left-4 z-50 md:hidden bg-blue-600 text-white p-2 rounded shadow-lg" id="mobileMenuBtn">
-<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
 </button>
-<!-- Sidebar (แก้ไขใหม่ รองรับ mobile) -->
 <aside class="fixed inset-y-0 left-0 w-64 bg-white shadow-md p-4 z-40 transform -translate-x-full transition-transform duration-200 md:relative md:translate-x-0 md:block" id="sidebar">
 <div class="text-xl font-bold mb-4 text-blue-600">OAE QR Generate</div>
 <nav class="space-y-3">
@@ -54,7 +39,6 @@
 <a class="nav-link block px-3 py-2 rounded hover:bg-gray-200" href="#settings">ตั้งค่า</a>
 </nav>
 </aside>
-<!-- Main Content -->
 <main class="flex-1 p-6 overflow-auto">
 <!-- QR Code Generator Section -->
 <section class="content-section" id="qr">
@@ -94,9 +78,8 @@
 <input class="w-full h-[38px] border rounded" id="qrBgColor" type="color" value="#ffffff"/>
 </div>
 </div>
-<!-- Logo Section -->
 <div class="mb-4 p-4 bg-gray-50 rounded-lg">
-<h3 class="font-semibold mb-2">🖼️ เพิ่มโลโก้ (ไม่บังคับ)</h3>
+<h3 class="font-semibold mb-2">&#128444;&#65039; เพิ่มโลโก้ (ไม่บังคับ)</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div>
 <label class="block mb-1 font-semibold">อัปโหลดโลโก้:</label>
@@ -125,7 +108,7 @@
 </div>
 <div class="mt-2 text-sm text-gray-600" id="logoStatus"></div>
 </div>
-<button class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium" onclick="generateQR()">🎨 สร้าง QR Code</button>
+<button class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium" onclick="generateQR()">&#127912; สร้าง QR Code</button>
 <div class="mt-6 text-center" id="qrContainer"></div>
 <div class="text-center mt-4 hidden" id="downloadBtn">
 <div class="flex gap-2 justify-center">
@@ -136,10 +119,18 @@
 </div>
 </div>
 </section>
+
 <!-- Short URL Section -->
 <section class="content-section hidden" id="shorturl">
 <h1 class="text-2xl font-bold text-blue-700 mb-6">ย่อ URL (Short URL)</h1>
 <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+
+<!-- Service info banner -->
+<div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 flex gap-2">
+  <span class="shrink-0">&#128279;</span>
+  <span>ใช้บริการ <strong>v.gd</strong> และ <strong>cleanuri.com</strong> — ฟรี ไม่มีโฆษณา ไม่ต้องสมัคร</span>
+</div>
+
 <label class="block mb-2 font-semibold">กรอกลิงก์ยาว (Long URL):</label>
 <input class="w-full p-2 border rounded mb-4" id="longUrl" placeholder="https://example.com/very/long/link" type="text"/>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -162,12 +153,12 @@
 <div class="bg-gray-50 p-3 rounded border">
 <input class="p-2 border rounded w-full text-center text-blue-700 font-semibold bg-white mb-2" id="shortLink" readonly=""/>
 <div class="text-sm text-gray-600 mb-2">
-              ความยาว: <span class="font-semibold" id="linkLength"></span> ตัวอักษร
-              <span class="ml-2 px-2 py-1 rounded text-xs" id="linkStatus"></span>
+  ความยาว: <span class="font-semibold" id="linkLength"></span> ตัวอักษร
+  <span class="ml-2 px-2 py-1 rounded text-xs" id="linkStatus"></span>
 </div>
 <div class="hidden text-sm text-orange-600 bg-orange-50 p-2 rounded mb-2" id="warningMessage">
-              ⚠️ นี่เป็นลิงก์จำลอง - ใช้เพื่อดูความยาวเท่านั้น ไม่สามารถใช้งานจริงได้
-            </div>
+  &#9888;&#65039; นี่เป็นลิงก์จำลอง - ใช้เพื่อดูความยาวเท่านั้น ไม่สามารถใช้งานจริงได้
+</div>
 <div class="flex gap-2 justify-center">
 <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onclick="copyShortLink()">คัดลอกลิงก์</button>
 <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="testShortLink()">ทดสอบลิงก์</button>
@@ -175,166 +166,45 @@
 </div>
 </div>
 </div>
-<!-- Ultra Short Links Section -->
 <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-<h3 class="font-semibold text-blue-800 mb-2">🚀 ลิงก์สั้นพิเศษ (Ultra Short)</h3>
+<h3 class="font-semibold text-blue-800 mb-2">&#128640; ลิงก์สั้นพิเศษ (Ultra Short)</h3>
 <p class="text-sm text-gray-700 mb-3">
-            ระบบจะพยายามสร้างลิงก์จริงก่อน หากไม่สำเร็จจะแสดงตัวอย่างความยาว<br/>
-<strong>ลิงก์จริง:</strong> TinyURL, is.gd (ใช้งานได้จริง)<br/>
-<strong>ลิงก์จำลอง:</strong> เพื่อดูตัวอย่างความยาวเท่านั้น
-          </p>
+  ระบบจะลอง v.gd ก่อน ถ้าไม่สำเร็จจะลอง cleanuri.com<br/>
+  <strong>ลิงก์จริง:</strong> v.gd, cleanuri.com (ใช้งานได้จริง ไม่มีโฆษณา)<br/>
+  <strong>ลิงก์จำลอง:</strong> แสดงเมื่อทุก API ไม่ตอบสนอง
+</p>
 <button class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700" onclick="generateUltraShort()">สร้างลิงก์สั้นพิเศษ</button>
 </div>
 </div>
 </section>
+
 <!-- PDF Tools Section -->
 <section class="content-section hidden" id="pdftools">
 <h1 class="text-2xl font-bold text-blue-700 mb-6">เครื่องมือ PDF (PDF Tools)</h1>
-<!-- PDF Tool Selection -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 <a class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" href="PDF Tool.html">
-<div class="text-3xl mb-2">📄</div>
+<div class="text-3xl mb-2">&#128196;</div>
 <h3 class="font-semibold">รวม PDF</h3>
 <p class="text-sm text-gray-600">รวมหลายไฟล์ PDF เป็นไฟล์เดียว</p>
 </a>
 <a class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" href="PDF Tool.html">
-<div class="text-3xl mb-2">✂️</div>
+<div class="text-3xl mb-2">&#9986;&#65039;</div>
 <h3 class="font-semibold">แยก PDF</h3>
 <p class="text-sm text-gray-600">แยกหน้า PDF เป็นไฟล์แยกต่างหาก</p>
 </a>
 <a class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" href="PDF Tool.html">
-<div class="text-3xl mb-2">🗜️</div>
+<div class="text-3xl mb-2">&#128284;&#65039;</div>
 <h3 class="font-semibold">บีบอัด PDF</h3>
 <p class="text-sm text-gray-600">ลดขนาดไฟล์ PDF</p>
 </a>
 <a class="block p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors" href="PDF Tool.html">
-<div class="text-3xl mb-2">🔄</div>
+<div class="text-3xl mb-2">&#128260;</div>
 <h3 class="font-semibold">แปลงไฟล์</h3>
 <p class="text-sm text-gray-600">แปลง PDF ↔ รูปภาพ, Word</p>
 </a>
 </div>
-<!-- PDF Merge Tool -->
-<div class="pdf-tool hidden" id="pdf-merge">
-<div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-<h2 class="text-xl font-bold mb-4 text-blue-700">📄 รวม PDF</h2>
-<div class="mb-4">
-<label class="block mb-2 font-semibold">เลือกไฟล์ PDF (หลายไฟล์):</label>
-<input accept=".pdf" class="w-full p-2 border rounded" id="mergeFiles" multiple="" type="file"/>
-<p class="text-sm text-gray-500 mt-1">เลือกไฟล์ PDF หลายๆ ไฟล์เพื่อรวมเป็นไฟล์เดียว</p>
-</div>
-<div class="mb-4 hidden" id="mergeFileList">
-<h3 class="font-semibold mb-2">ไฟล์ที่เลือก:</h3>
-<div class="space-y-2" id="mergeList"></div>
-</div>
-<button class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium" onclick="mergePDFs()">
-            📄 รวม PDF
-          </button>
-<div class="mt-4 hidden" id="mergeProgress">
-<div class="bg-gray-200 rounded-full h-3">
-<div class="bg-blue-600 h-3 rounded-full transition-all duration-300" id="mergeProgressBar" style="width: 0%"></div>
-</div>
-<p class="text-sm text-gray-600 mt-1">กำลังรวมไฟล์...</p>
-</div>
-</div>
-</div>
-<!-- PDF Split Tool -->
-<div class="pdf-tool hidden" id="pdf-split">
-<div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-<h2 class="text-xl font-bold mb-4 text-blue-700">✂️ แยก PDF</h2>
-<div class="mb-4">
-<label class="block mb-2 font-semibold">เลือกไฟล์ PDF:</label>
-<input accept=".pdf" class="w-full p-2 border rounded" id="splitFile" type="file"/>
-</div>
-<div class="mb-4 hidden" id="splitOptions">
-<h3 class="font-semibold mb-2">ตัวเลือกการแยก:</h3>
-<div class="space-y-3">
-<label class="inline-flex items-center">
-<input checked="" class="mr-2" name="splitType" type="radio" value="pages"/>
-<span>แยกเป็นหน้าๆ (1 หน้าต่อ 1 ไฟล์)</span>
-</label>
-<label class="inline-flex items-center">
-<input class="mr-2" name="splitType" type="radio" value="range"/>
-<span>แยกตามช่วงหน้า</span>
-</label>
-</div>
-<div class="mt-3 hidden" id="rangeInput">
-<label class="block mb-1 text-sm">ช่วงหน้า (เช่น 1-5, 10-15):</label>
-<input class="w-full p-2 border rounded" id="pageRange" placeholder="1-5" type="text"/>
-</div>
-</div>
-<button class="bg-red-600 text-white px-6 py-3 rounded hover:bg-red-700 font-medium" onclick="splitPDF()">
-            ✂️ แยก PDF
-          </button>
-</div>
-</div>
-<!-- PDF Compress Tool -->
-<div class="pdf-tool hidden" id="pdf-compress">
-<div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-<h2 class="text-xl font-bold mb-4 text-blue-700">🗜️ บีบอัด PDF</h2>
-<div class="mb-4">
-<label class="block mb-2 font-semibold">เลือกไฟล์ PDF:</label>
-<input accept=".pdf" class="w-full p-2 border rounded" id="compressFile" type="file"/>
-</div>
-<div class="mb-4">
-<label class="block mb-2 font-semibold">ระดับการบีบอัด:</label>
-<select class="w-full p-2 border rounded" id="compressionLevel">
-<option value="low">ต่ำ (คุณภาพสูง, ขนาดใหญ่)</option>
-<option selected="" value="medium">กลาง (สมดุล)</option>
-<option value="high">สูง (คุณภาพต่ำ, ขนาดเล็ก)</option>
-</select>
-</div>
-<div class="text-sm text-gray-600 mb-4 hidden" id="originalSize"></div>
-<button class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 font-medium" onclick="compressPDF()">
-            🗜️ บีบอัด PDF
-          </button>
-<div class="mt-4 hidden" id="compressResult">
-<div class="bg-green-50 p-3 rounded border">
-<h3 class="font-semibold text-green-800">ผลลัพธ์การบีบอัด:</h3>
-<div class="text-sm text-green-700" id="compressionStats"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- PDF Convert Tool -->
-<div class="pdf-tool hidden" id="pdf-convert">
-<div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-<h2 class="text-xl font-bold mb-4 text-blue-700">🔄 แปลงไฟล์</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-<div>
-<label class="block mb-2 font-semibold">แปลงจาก:</label>
-<select class="w-full p-2 border rounded" id="convertFrom">
-<option value="pdf">PDF</option>
-<option value="image">รูปภาพ (JPG, PNG)</option>
-<option value="word">Word (.docx)</option>
-</select>
-</div>
-<div>
-<label class="block mb-2 font-semibold">แปลงเป็น:</label>
-<select class="w-full p-2 border rounded" id="convertTo">
-<option value="image">รูปภาพ (PNG)</option>
-<option value="pdf">PDF</option>
-<option value="word">Word (.docx)</option>
-</select>
-</div>
-</div>
-<div class="mb-4">
-<label class="block mb-2 font-semibold">เลือกไฟล์:</label>
-<input class="w-full p-2 border rounded" id="convertFile" type="file"/>
-</div>
-<div class="mb-4 hidden" id="convertOptions">
-<label class="block mb-2 font-semibold">คุณภาพรูปภาพ:</label>
-<select class="w-full p-2 border rounded" id="imageQuality">
-<option value="low">ต่ำ (72 DPI)</option>
-<option selected="" value="medium">กลาง (150 DPI)</option>
-<option value="high">สูง (300 DPI)</option>
-</select>
-</div>
-<button class="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 font-medium" onclick="convertFile()">
-            🔄 แปลงไฟล์
-          </button>
-</div>
-</div>
 </section>
+
 <!-- Settings Section -->
 <section class="content-section hidden" id="settings">
 <h1 class="text-2xl font-bold text-blue-700 mb-6">ตั้งค่า</h1>
@@ -343,1527 +213,493 @@
 <div>
 <h3 class="text-lg font-semibold mb-3">ตั้งค่าทั่วไป</h3>
 <div class="space-y-3">
-<label class="inline-flex items-center">
-<input class="mr-2" id="autosave" type="checkbox"/>
-<span>บันทึกอัตโนมัติ</span>
-</label>
-<label class="inline-flex items-center">
-<input class="mr-2" id="darkmode" type="checkbox"/>
-<span>โหมดกลางคืน</span>
-</label>
-<label class="inline-flex items-center">
-<input class="mr-2" id="animations" type="checkbox"/>
-<span>เอฟเฟกต์แอนิเมชัน</span>
-</label>
-<label class="inline-flex items-center">
-<input checked="" class="mr-2" id="confirmDelete" type="checkbox"/>
-<span>ยืนยันก่อนลบ</span>
-</label>
-</div>
-</div>
-<div>
-<h3 class="text-lg font-semibold mb-3">ตั้งค่า QR Code</h3>
-<div class="space-y-3">
-<div>
-<label class="block mb-1 font-semibold">ขนาดเริ่มต้น:</label>
-<select class="w-full p-2 border rounded" id="defaultQRSize">
-<option value="200">เล็ก - 200x200 px</option>
-<option selected="" value="300">กลาง - 300x300 px</option>
-<option value="400">ใหญ่ - 400x400 px</option>
-<option value="500">ใหญ่พิเศษ - 500x500 px</option>
-</select>
-</div>
-<div>
-<label class="block mb-1 font-semibold">สีเริ่มต้น:</label>
-<input class="w-full h-[38px] border rounded" id="defaultQRColor" type="color" value="#000000"/>
-</div>
-<div>
-<label class="block mb-1 font-semibold">สีพื้นหลังเริ่มต้น:</label>
-<input class="w-full h-[38px] border rounded" id="defaultQRBgColor" type="color" value="#ffffff"/>
-</div>
-<div>
-<label class="block mb-1 font-semibold">สไตล์เริ่มต้น:</label>
-<select class="w-full p-2 border rounded" id="defaultQRStyle">
-<option selected="" value="square">มาตรฐาน (Square)</option>
-<option value="dots">จุด (Dots)</option>
-<option value="rounded">มุมมน (Rounded)</option>
-<option value="classy">สวยหรู (Classy)</option>
-<option value="classy-rounded">Classy + Rounded</option>
-<option value="extra-rounded">Extra Rounded</option>
-</select>
-</div>
-</div>
-</div>
-<div>
-<h3 class="text-lg font-semibold mb-3">ตั้งค่า PDF</h3>
-<div class="space-y-3">
-<div>
-<label class="block mb-1 font-semibold">คุณภาพบีบอัดเริ่มต้น:</label>
-<select class="w-full p-2 border rounded" id="defaultCompressionLevel">
-<option value="low">ต่ำ (คุณภาพสูง)</option>
-<option selected="" value="medium">กลาง (สมดุล)</option>
-<option value="high">สูง (ขนาดเล็ก)</option>
-</select>
-</div>
-<label class="inline-flex items-center">
-<input checked="" class="mr-2" id="autoDownload" type="checkbox"/>
-<span>ดาวน์โหลดอัตโนมัติหลังประมวลผล</span>
-</label>
-</div>
-</div>
-<div>
-<h3 class="text-lg font-semibold mb-3">ตั้งค่าข้อมูล</h3>
-<div class="space-y-3">
-<button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mr-2" onclick="exportSettings()">
-                📤 ส่งออกการตั้งค่า
-              </button>
-<button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2" onclick="importSettings()">
-                📥 นำเข้าการตั้งค่า
-              </button>
-<button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" onclick="resetSettings()">
-                🔄 รีเซ็ตการตั้งค่า
-              </button>
-<input accept=".json" class="hidden" id="importFile" type="file"/>
+<label class="inline-flex items-center"><input class="mr-2" id="autosave" type="checkbox"/><span>บันทึกอัตโนมัติ</span></label>
+<label class="inline-flex items-center"><input class="mr-2" id="darkmode" type="checkbox"/><span>โหมดกลางคืน</span></label>
+<label class="inline-flex items-center"><input class="mr-2" id="animations" type="checkbox"/><span>เอฟเฟกต์แอนิเมชัน</span></label>
+<label class="inline-flex items-center"><input checked="" class="mr-2" id="confirmDelete" type="checkbox"/><span>ยืนยันก่อนลบ</span></label>
 </div>
 </div>
 <div>
 <h3 class="text-lg font-semibold mb-3">เกี่ยวกับ</h3>
 <div class="bg-gray-50 p-4 rounded-lg">
-<p class="text-gray-700 font-semibold">OAE QR Generate v1.2</p>
+<p class="text-gray-700 font-semibold">OAE QR Generate v1.3</p>
 <p class="text-gray-600">สร้างและจัดการ QR Code, Short URL และ PDF</p>
 <p class="text-gray-600 text-sm mt-2">
-                🔧 พัฒนาโดย: สำนักงานเศรษฐกิจการเกษตร<br/>
-                📧 ติดต่อ: support@oae.go.th<br/>
-                🌐 เว็บไซต์: <a class="text-blue-600 hover:underline" href="https://www.oae.go.th">www.oae.go.th</a>
+  &#128295; พัฒนาโดย: สำนักงานเศรษฐกิจการเกษตร<br/>
+  &#128231; ติดต่อ: support@oae.go.th<br/>
+  &#127760; เว็บไซต์: <a class="text-blue-600 hover:underline" href="https://www.oae.go.th">www.oae.go.th</a>
 </p>
 </div>
 </div>
 <div class="flex gap-3">
-<button class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium flex-1" onclick="saveSettings()">
-              💾 บันทึกการตั้งค่า
-            </button>
-<button class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 font-medium flex-1" onclick="applySettings()">
-              ✅ ใช้การตั้งค่า
-            </button>
+<button class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 font-medium flex-1" onclick="saveSettings()">&#128190; บันทึกการตั้งค่า</button>
 </div>
-<div class="text-center text-sm text-gray-600 hidden" id="settingsStatus">
-            การตั้งค่าถูกบันทึกแล้ว ✅
-          </div>
+<div class="text-center text-sm text-gray-600 hidden" id="settingsStatus">การตั้งค่าถูกบันทึกแล้ว &#9989;</div>
 </div>
 </div>
 </section>
 </main>
+
 <!-- Security Protection Scripts -->
 <script>
-    (function() {
-      'use strict';
+(function() {
+  'use strict';
+  function showSecurityAlert(message) {
+    message = message || 'การกระทำนี้ไม่ได้รับอนุญาต!';
+    const alertDiv = document.createElement('div');
+    alertDiv.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;font-family:Arial,sans-serif;"><div style="background:white;padding:30px;border-radius:10px;text-align:center;max-width:400px;"><div style="color:#dc2626;font-size:60px;">&#128683;</div><h2 style="color:#dc2626;">ข้อความแจ้งเตือน</h2><p style="color:#374151;">' + message + '</p><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:#dc2626;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;">ตกลง</button></div></div>';
+    document.body.appendChild(alertDiv);
+    setTimeout(function() { if (alertDiv.parentElement) alertDiv.remove(); }, 3000);
+  }
+  document.addEventListener('contextmenu', function(e) {
+    if (!['INPUT','TEXTAREA'].includes(e.target.tagName)) { e.preventDefault(); showSecurityAlert('การคลิกขวาไม่ได้รับอนุญาต'); }
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 123) { e.preventDefault(); showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต'); return false; }
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) { e.preventDefault(); showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต'); return false; }
+    if (e.ctrlKey && e.keyCode === 85) { e.preventDefault(); showSecurityAlert('การดูซอร์สโค้ดไม่ได้รับอนุญาต'); return false; }
+    if (e.ctrlKey && e.keyCode === 83 && !['INPUT','TEXTAREA'].includes(e.target.tagName)) { e.preventDefault(); showSecurityAlert('การบันทึกหน้าเว็บไม่ได้รับอนุญาต'); return false; }
+  });
+  document.addEventListener('dragstart', function(e) { if (e.target.tagName === 'IMG') { e.preventDefault(); return false; } });
+  const style = document.createElement('style');
+  style.innerHTML = '@media print { body { display: none !important; } }';
+  document.head.appendChild(style);
+  window.showSecurityAlert = showSecurityAlert;
+  console.log('Security protection activated');
+})();
+</script>
 
-      // แสดงข้อความแจ้งเตือนความปลอดภัย
-      function showSecurityAlert(message = 'การกระทำนี้ไม่ได้รับอนุญาต!') {
-        // สร้าง popup แจ้งเตือน
-        const alertDiv = document.createElement('div');
-        alertDiv.innerHTML = `
-          <div style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-          ">
-            <div style="
-              background: white;
-              padding: 30px;
-              border-radius: 10px;
-              text-align: center;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-              max-width: 400px;
-            ">
-              <div style="color: #dc2626; font-size: 60px; margin-bottom: 20px;">🚫</div>
-              <h2 style="color: #dc2626; margin: 0 0 15px 0;">ข้อความแจ้งเตือน</h2>
-              <p style="color: #374151; margin: 0 0 20px 0; line-height: 1.5;">${message}</p>
-              <p style="color: #6b7280; font-size: 14px; margin: 0 0 20px 0;">
-                เว็บไซต์นี้ได้รับการป้องกันเพื่อความปลอดภัยของข้อมูล
-              </p>
-              <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
-                background: #dc2626;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-              ">ตกลง</button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(alertDiv);
-
-        // ลบแจ้งเตือนอัตโนมัติหลัง 3 วินาที
-        setTimeout(() => {
-          if (alertDiv.parentElement) {
-            alertDiv.remove();
-          }
-        }, 3000);
-      }
-
-      // ป้องกันการคลิกขวา (แต่ไม่ขัดขวางการทำงานปกติ)
-      document.addEventListener('contextmenu', function(e) {
-        // ยกเว้นใน input และ textarea เพื่อให้ใช้เมนูคลิกขวาได้
-        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-          e.preventDefault();
-          showSecurityAlert('การคลิกขวาไม่ได้รับอนุญาต');
-        }
-      });
-
-      // ป้องกันปุ่มลัดบางส่วน (แต่ไม่เข้มงวดเกินไป)
-      document.addEventListener('keydown', function(e) {
-        // F12 - Developer Tools
-        if (e.keyCode === 123) {
-          e.preventDefault();
-          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+Shift+I (Developer Tools)
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-          e.preventDefault();
-          showSecurityAlert('การใช้ Developer Tools ไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+U (View Source)
-        if (e.ctrlKey && e.keyCode === 85) {
-          e.preventDefault();
-          showSecurityAlert('การดูซอร์สโค้ดไม่ได้รับอนุญาต');
-          return false;
-        }
-        
-        // Ctrl+S (Save Page) - ยกเว้นเมื่ออยู่ใน input/textarea
-        if (e.ctrlKey && e.keyCode === 83 && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-          e.preventDefault();
-          showSecurityAlert('การบันทึกหน้าเว็บไม่ได้รับอนุญาต');
-          return false;
-        }
-      });
-
-      // ป้องกันการเลือกข้อความ (ยกเว้นใน input/textarea และ element ที่จำเป็น)
-      document.addEventListener('selectstart', function(e) {
-        // e.target อาจเป็น Text node/Document (ไม่มี closest) ในบางกรณี
-        const t = e.target;
-        const el = (t && t.nodeType === 1) ? t : (t && t.parentElement ? t.parentElement : null);
-        if (!el) return; // ถ้าระบุ element ไม่ได้ ให้ไม่บล็อก (เลี่ยง error)
-
-        const tag = el.tagName || '';
-        const isAllowed =
-          ['INPUT', 'TEXTAREA', 'BUTTON'].includes(tag) ||
-          (typeof el.closest === 'function' && (el.closest('[contenteditable]') || el.closest('.allow-select')));
-
-        if (!isAllowed) {
-          e.preventDefault();
-          return false;
-        }
-      });
-// ป้องกันการลากเฉพาะรูปภาพ
-      document.addEventListener('dragstart', function(e) {
-        if (e.target.tagName === 'IMG') {
-          e.preventDefault();
-          return false;
-        }
-      });
-
-      // ป้องกันการ print ด้วย CSS media query
-      const style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = `
-        @media print {
-          body { display: none !important; }
-          body::before { 
-            content: "การพิมพ์เอกสารนี้ไม่ได้รับอนุญาต"; 
-            font-size: 20px; 
-            color: red; 
-            display: block; 
-            text-align: center; 
-            margin-top: 50px; 
-          }
-        }
-      `;
-      document.head.appendChild(style);
-
-      // ทำให้ window.showSecurityAlert สามารถเรียกใช้ได้จากภายนอก (สำหรับ debugging)
-      window.showSecurityAlert = showSecurityAlert;
-
-      console.log('🔒 Security protection activated (lite version)');
-
-    })();
-  </script>
 <script>
-    let qr = null;
-    let logoImage = null;
+let qr = null;
+let logoImage = null;
 
-    // Navigation Functions - Fixed
-    function showSection(sectionId) {
-      console.log('Switching to section:', sectionId);
-      
-      // Hide all sections
-      document.querySelectorAll(".content-section").forEach(section => {
-        section.classList.add("hidden");
-      });
-      
-      // Show target section
-      const targetSection = document.getElementById(sectionId);
-      if (targetSection) {
-        targetSection.classList.remove("hidden");
-        console.log('Section shown:', sectionId);
-      } else {
-        console.error('Section not found:', sectionId);
-      }
-      
-      // Update navigation active state
-      document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.remove("bg-blue-100", "text-blue-700", "font-medium");
-        link.classList.add("hover:bg-gray-200");
-      });
-      
-      const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
-      if (activeLink) {
-        activeLink.classList.add("bg-blue-100", "text-blue-700", "font-medium");
-        activeLink.classList.remove("hover:bg-gray-200");
-        console.log('Navigation updated for:', sectionId);
-      }
-    }
+function showSection(sectionId) {
+  document.querySelectorAll(".content-section").forEach(s => s.classList.add("hidden"));
+  const target = document.getElementById(sectionId);
+  if (target) target.classList.remove("hidden");
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.classList.remove("bg-blue-100","text-blue-700","font-medium");
+    link.classList.add("hover:bg-gray-200");
+  });
+  const active = document.querySelector('a[href="#' + sectionId + '"]');
+  if (active) { active.classList.add("bg-blue-100","text-blue-700","font-medium"); active.classList.remove("hover:bg-gray-200"); }
+}
 
-    // QR Code Functions
+function normalizeQrPayload(input) {
+  const s = String(input || '').trim();
+  if (/^https?:\/\//i.test(s)) {
+    try { return new URL(s).href; } catch (e) { return encodeURI(s); }
+  }
+  return s;
+}
 
-    // Normalize QR payload for best scanner compatibility.
-    // For URLs containing Thai/non-ASCII characters, convert to a fully percent-encoded ASCII URL.
-    function normalizeQrPayload(input) {
-      const s = String(input || '').trim();
-      if (/^https?:\/\//i.test(s)) {
-        try {
-          // URL().href returns a normalized, percent-encoded URL (ASCII-safe)
-          return new URL(s).href;
-        } catch (e) {
-          // Fallback: encodeURI keeps protocol/slashes but percent-encodes non-ASCII
-          return encodeURI(s);
-        }
-      }
-      return s;
-    }
-    
-    async function generateQR() {
-      const text = document.getElementById("qrText").value.trim();
-      const size = parseInt(document.getElementById("qrSize").value);
-      const color = document.getElementById("qrColor").value;
-      const bgColor = document.getElementById("qrBgColor").value;
-      const style = document.getElementById("qrStyle").value;
-      const logoSize = parseFloat(document.getElementById("logoSize").value);
-      const logoBackground = document.getElementById("logoBackground").checked;
-
-      if (!text) return alert("กรุณากรอกข้อความก่อน");
-
-      // Normalize payload (important for Thai/non-ASCII URLs)
-      const payload = normalizeQrPayload(text);
-
-      // Clear previous QR
-      if (qr) {
+async function generateQR() {
+  const text = document.getElementById("qrText").value.trim();
+  const size = parseInt(document.getElementById("qrSize").value);
+  const color = document.getElementById("qrColor").value;
+  const bgColor = document.getElementById("qrBgColor").value;
+  const style = document.getElementById("qrStyle").value;
+  const logoSize = parseFloat(document.getElementById("logoSize").value);
+  const logoBackground = document.getElementById("logoBackground").checked;
+  if (!text) return alert("กรุณากรอกข้อความก่อน");
+  const payload = normalizeQrPayload(text);
+  if (qr) document.getElementById("qrContainer").innerHTML = "";
+  const EXPORT_SCALE = 4;
+  const renderSize = size * EXPORT_SCALE;
+  const ecl = logoImage ? 'H' : (payload.length > 250 ? 'L' : 'M');
+  const qrConfig = {
+    width: renderSize, height: renderSize, data: payload,
+    qrOptions: { errorCorrectionLevel: ecl },
+    dotsOptions: { color: color, type: style },
+    backgroundOptions: { color: bgColor },
+    cornersSquareOptions: { color: color, type: style === "dots" ? "square" : style },
+    cornersDotOptions: { color: color, type: style === "dots" ? "square" : style }
+  };
+  if (logoImage) {
+    qrConfig.image = logoImage;
+    qrConfig.imageOptions = { crossOrigin: "anonymous", margin: 10, imageSize: logoSize, hideBackgroundDots: logoBackground, saveAsBlob: true };
+  }
+  try {
+    qr = new QRCodeStyling(qrConfig);
+    await new Promise(r => setTimeout(r, 100));
+    qr.append(document.getElementById("qrContainer"));
+    const rawEl = document.getElementById("qrContainer").firstElementChild;
+    if (rawEl) { rawEl.style.width = size + "px"; rawEl.style.height = size + "px"; }
+    document.getElementById("downloadBtn").classList.remove("hidden");
+    setTimeout(() => {
+      const qrEl = document.getElementById("qrContainer").firstElementChild;
+      if (qrEl) {
+        const oaeFrame = document.createElement("div");
+        oaeFrame.className = "inline-block bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200";
+        const header = document.createElement("div");
+        header.className = "bg-[#c8e6c9] px-6 py-3 text-center";
+        header.innerHTML = '<div class="text-[#2e7d32] font-bold text-lg tracking-wider">OAE QR CODE</div>';
+        const body = document.createElement("div");
+        body.className = "bg-white p-8 flex justify-center items-center";
+        body.appendChild(qrEl);
+        const footer = document.createElement("div");
+        footer.className = "bg-[#1b5e20] px-6 py-4 text-center";
+        footer.innerHTML = '<div class="text-white font-medium text-sm">สำนักงานเศรษฐกิจการเกษตร</div>';
+        oaeFrame.appendChild(header); oaeFrame.appendChild(body); oaeFrame.appendChild(footer);
         document.getElementById("qrContainer").innerHTML = "";
+        document.getElementById("qrContainer").appendChild(oaeFrame);
       }
+    }, 100);
+  } catch (error) { console.error("Error generating QR:", error); alert("เกิดข้อผิดพลาดในการสร้าง QR Code"); }
+}
 
-      // Hi-res QR Code configuration (render bigger than display)
-      const EXPORT_SCALE = 4;
-      const renderSize = size * EXPORT_SCALE;
+function downloadQR(format) {
+  format = format || 'png';
+  if (qr) qr.download({ name: 'qr-code-' + Date.now(), extension: format });
+}
 
-      // Error correction: prefer capacity for very long URLs, but raise for QR-with-logo.
-      const ecl = logoImage ? 'H' : (payload.length > 250 ? 'L' : 'M');
+function clearLogo() {
+  logoImage = null;
+  document.getElementById("logoUpload").value = "";
+  if (document.getElementById("qrText").value.trim()) generateQR();
+}
 
-      const qrConfig = {
-        width: renderSize,
-        height: renderSize,
-        data: payload,
-        qrOptions: {
-          errorCorrectionLevel: ecl
-        },
-        dotsOptions: {
-          color: color,
-          type: style
-        },
-        backgroundOptions: {
-          color: bgColor
-        },
-        cornersSquareOptions: {
-          color: color,
-          type: style === "dots" ? "square" : style
-        },
-        cornersDotOptions: {
-          color: color,
-          type: style === "dots" ? "square" : style
-        }
-      };
+function testLogo() {
+  if (logoImage) {
+    const img = new Image();
+    img.onload = () => console.log("Logo OK:", img.width, "x", img.height);
+    img.onerror = () => console.error("Logo failed");
+    img.src = logoImage;
+  }
+}
 
-      // Add logo configuration if logo exists
-      if (logoImage) {
-        qrConfig.image = logoImage;
-        qrConfig.imageOptions = {
-          crossOrigin: "anonymous",
-          margin: 10,
-          imageSize: logoSize,
-          hideBackgroundDots: logoBackground,
-          saveAsBlob: true
-        };
-        
-        console.log("Logo added to QR config:", {
-          imageSize: logoSize,
-          hideBackgroundDots: logoBackground,
-          logoImage: logoImage ? "Present" : "Missing"
-        });
-      } else {
-        console.log("No logo to add");
-      }
+// ─────────────────────────────────────────────────────────────
+//  SHORT URL FUNCTIONS — ใช้ v.gd + cleanuri.com (ไม่มีโฆษณา)
+//  รองรับทั้ง hosted server และ local file:// ผ่าน CORS proxy
+// ─────────────────────────────────────────────────────────────
 
-      try {
-        qr = new QRCodeStyling(qrConfig);
-        
-        // Wait a bit for the library to process
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        qr.append(document.getElementById("qrContainer"));
+// ── ฟังก์ชัน fetch พร้อม CORS proxy fallback ──────────────────
+async function fetchWithFallback(directUrl, options) {
+  // รอบที่ 1: ลอง fetch ตรง
+  try {
+    const res = await fetch(directUrl, { ...options, mode: "cors", signal: AbortSignal.timeout(6000) });
+    if (res.ok) return res;
+  } catch (e) {
+    console.warn("Direct fetch failed:", e.message, "→ trying CORS proxy...");
+  }
+  // รอบที่ 2: ผ่าน CORS proxy (แก้ปัญหา file:// หรือ server block CORS)
+  try {
+    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(directUrl);
+    const res = await fetch(proxyUrl, { mode: "cors", signal: AbortSignal.timeout(8000) });
+    if (res.ok) return res;
+  } catch (e) {
+    console.warn("CORS proxy also failed:", e.message);
+  }
+  return null;
+}
 
-        // Resize canvas/SVG for display while keeping hi-res internal size
-        const rawEl = document.getElementById("qrContainer").firstElementChild;
-        if (rawEl) {
-          rawEl.style.width = size + "px";
-          rawEl.style.height = size + "px";
-        }
+// ── v.gd helper ──────────────────────────────────────────────
+async function callVgd(longUrl, customAlias) {
+  let url = "https://v.gd/create.php?format=simple&url=" + encodeURIComponent(longUrl);
+  if (customAlias) url += "&shorturl=" + encodeURIComponent(customAlias);
+  const res = await fetchWithFallback(url, {});
+  if (!res) return null;
+  const text = (await res.text()).replace(/^\ufeff/, "").trim();
+  // v.gd returns error text like "Error: ..." on failure
+  if (!text.startsWith("http")) { console.warn("v.gd error:", text); return null; }
+  return text;
+}
 
-        document.getElementById("downloadBtn").classList.remove("hidden");
+// ── cleanuri.com helper ───────────────────────────────────────
+async function callCleanuri(longUrl) {
+  const directUrl = "https://cleanuri.com/api/v1/shorten";
+  // cleanuri รับ POST form-data
+  const body = "url=" + encodeURIComponent(longUrl);
 
-        // ใส่กรอบกล่องรอบ QR Code แบบ OAE
-        setTimeout(() => {
-          const qrEl = document.getElementById("qrContainer").firstElementChild;
-          if (qrEl) {
-            // สร้างกรอบแบบ OAE
-            const oaeFrame = document.createElement("div");
-            oaeFrame.className = "inline-block bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200";
-            
-            // ส่วนหัว (Header) - สีเขียวอ่อน
-            const header = document.createElement("div");
-            header.className = "bg-[#c8e6c9] px-6 py-3 text-center";
-            header.innerHTML = '<div class="text-[#2e7d32] font-bold text-lg tracking-wider">OAE QR CODE</div>';
-            
-            // ส่วนกลาง (Body) - พื้นหลังสีขาวสำหรับ QR Code
-            const body = document.createElement("div");
-            body.className = "bg-white p-8 flex justify-center items-center";
-            body.appendChild(qrEl);
-            
-            // ส่วนท้าย (Footer) - สีเขียวเข้ม
-            const footer = document.createElement("div");
-            footer.className = "bg-[#1b5e20] px-6 py-4 text-center";
-            footer.innerHTML = '<div class="text-white font-medium text-sm">สำนักงานเศรษฐกิจการเกษตร</div>';
-            
-            // รวมทุกส่วนเข้าด้วยกัน
-            oaeFrame.appendChild(header);
-            oaeFrame.appendChild(body);
-            oaeFrame.appendChild(footer);
-            
-            // แทนที่ QR Code เดิมด้วยกรอบใหม่
-            document.getElementById("qrContainer").innerHTML = "";
-            document.getElementById("qrContainer").appendChild(oaeFrame);
-          }
-        }, 100);
-        
-        console.log("QR Code generated successfully (hi-res)");
-      } catch (error) {
-        console.error("Error generating QR Code:", error);
-        alert("เกิดข้อผิดพลาดในการสร้าง QR Code");
-      }
+  // รอบที่ 1: ลองตรง
+  try {
+    const res = await fetch(directUrl, {
+      method: "POST", mode: "cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body, signal: AbortSignal.timeout(6000)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.result_url) return data.result_url;
     }
+  } catch (e) { console.warn("cleanuri direct failed:", e.message); }
 
-function downloadQR(format = 'png') {
-      if (qr) {
-        const filename = `qr-code-${Date.now()}`;
-        qr.download({ 
-          name: filename, 
-          extension: format 
-        });
-      }
+  // รอบที่ 2: ผ่าน CORS proxy (GET พร้อม query param แทน POST)
+  try {
+    const proxyPost = "https://corsproxy.io/?" + encodeURIComponent(directUrl);
+    const res = await fetch(proxyPost, {
+      method: "POST", mode: "cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body, signal: AbortSignal.timeout(8000)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.result_url) return data.result_url;
     }
+  } catch (e) { console.warn("cleanuri proxy failed:", e.message); }
 
-    function clearLogo() {
-      logoImage = null;
-      document.getElementById("logoUpload").value = "";
-      
-      console.log("Logo cleared");
-      
-      // Regenerate QR without logo if QR exists
-      if (document.getElementById("qrText").value.trim()) {
-        generateQR();
-      }
+  return null;
+}
+
+// ── ฟังก์ชันหลัก ──────────────────────────────────────────────
+async function createAutoShortURL(longUrl) {
+  updateLinkStatus("trying", "กำลังลอง v.gd...");
+
+  const vgdResult = await callVgd(longUrl);
+  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
+
+  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
+
+  const cleanResult = await callCleanuri(longUrl);
+  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
+
+  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+  return null; // ไม่คืนลิงก์จำลอง
+}
+
+async function createReadableShortURL(longUrl) {
+  updateLinkStatus("trying", "กำลังลอง v.gd...");
+  const vgdResult = await callVgd(longUrl);
+  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
+
+  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
+  const cleanResult = await callCleanuri(longUrl);
+  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
+
+  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+  return null;
+}
+
+async function createCustomShortURL(longUrl, customCode) {
+  updateLinkStatus("trying", "กำลังลอง v.gd (custom alias)...");
+  const vgdResult = await callVgd(longUrl, customCode);
+  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
+
+  // cleanuri ไม่รองรับ custom alias → ลอง v.gd แบบ random
+  updateLinkStatus("trying", "alias นี้อาจถูกใช้แล้ว ลอง v.gd (random)...");
+  const vgdRandom = await callVgd(longUrl);
+  if (vgdRandom) { updateLinkStatus(true, "v.gd (random)"); return vgdRandom; }
+
+  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
+  const cleanResult = await callCleanuri(longUrl);
+  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
+
+  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+  return null;
+}
+
+function updateLinkStatus(isReal, serviceName) {
+  const statusSpan  = document.getElementById("linkStatus");
+  const warningDiv  = document.getElementById("warningMessage");
+  if (!statusSpan) return;
+
+  if (isReal === "trying") {
+    statusSpan.textContent = "⏳ " + (serviceName || "กำลังลอง...");
+    statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-gray-100 text-gray-600";
+    warningDiv && warningDiv.classList.add("hidden");
+  } else if (isReal === true) {
+    statusSpan.textContent = "✅ ใช้งานได้จริง" + (serviceName ? " (" + serviceName + ")" : "");
+    statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-green-100 text-green-800";
+    warningDiv && warningDiv.classList.add("hidden");
+  } else {
+    statusSpan.textContent = "❌ " + (serviceName || "ไม่สำเร็จ");
+    statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-red-100 text-red-700";
+    warningDiv && warningDiv.classList.remove("hidden");
+  }
+}
+
+async function shortenURL() {
+  const longUrl    = document.getElementById("longUrl").value.trim();
+  const urlType    = document.getElementById("urlType").value;
+  const customCode = document.getElementById("customCode").value.trim();
+  const resultDiv  = document.getElementById("shortResult");
+  const shortLinkInput = document.getElementById("shortLink");
+  const lengthSpan = document.getElementById("linkLength");
+  const warningDiv = document.getElementById("warningMessage");
+  const button     = document.querySelector('button[onclick="shortenURL()"]');
+
+  if (!longUrl) { alert("กรุณากรอกลิงก์ก่อน"); return; }
+  if (!longUrl.startsWith("http://") && !longUrl.startsWith("https://")) {
+    alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://example.com"); return;
+  }
+
+  button.disabled = true;
+  button.textContent = "กำลังสร้าง...";
+  resultDiv.classList.remove("hidden");
+  shortLinkInput.value = "";
+  lengthSpan.textContent = "–";
+  warningDiv && warningDiv.classList.add("hidden");
+
+  let shortLink = null;
+  try {
+    if (urlType === "custom" && customCode) {
+      shortLink = await createCustomShortURL(longUrl, customCode);
+    } else if (urlType === "readable") {
+      shortLink = await createReadableShortURL(longUrl);
+    } else {
+      shortLink = await createAutoShortURL(longUrl);
     }
+  } catch (err) { console.error("shortenURL error:", err); }
 
-    function testLogo() {
-      if (logoImage) {
-        console.log("Logo image data:", logoImage.substring(0, 50) + "...");
-        
-        // Create a test image to verify logo loads
+  button.disabled = false;
+  button.textContent = "สร้างลิงก์สั้น";
+
+  if (shortLink) {
+    shortLinkInput.value = shortLink;
+    lengthSpan.textContent = shortLink.length;
+  } else {
+    shortLinkInput.value = "";
+    lengthSpan.textContent = "–";
+    updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+    if (warningDiv) {
+      warningDiv.innerHTML =
+        "❌ ไม่สามารถย่อลิงก์ได้ — เหตุผลที่พบบ่อย:<br>" +
+        "① รันจากไฟล์ local (<code>file://</code>) → ให้ upload ขึ้น GitHub Pages / Vercel ก่อน<br>" +
+        "② เครือข่ายบล็อก API ภายนอก<br>" +
+        "③ API ขัดข้องชั่วคราว (ลองใหม่อีกครั้ง)";
+      warningDiv.classList.remove("hidden");
+    }
+  }
+}
+
+function generateUltraShort() {
+  const longUrl = document.getElementById("longUrl").value.trim();
+  if (!longUrl) { alert("กรุณากรอกลิงก์ก่อน"); return; }
+  if (!longUrl.startsWith("http://") && !longUrl.startsWith("https://")) { alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://example.com"); return; }
+  createAutoShortURL(longUrl).then(function(result) {
+    document.getElementById("shortLink").value = result;
+    document.getElementById("linkLength").textContent = result.length;
+    document.getElementById("shortResult").classList.remove("hidden");
+  });
+
+}
+
+function copyShortLink() {
+  const shortLinkInput = document.getElementById("shortLink");
+  shortLinkInput.select();
+  shortLinkInput.setSelectionRange(0, 99999);
+  try {
+    document.execCommand("copy");
+    alert("คัดลอกลิงก์สั้นแล้ว!");
+  } catch (err) {
+    navigator.clipboard.writeText(shortLinkInput.value).then(() => alert("คัดลอกลิงก์สั้นแล้ว!")).catch(() => alert("ไม่สามารถคัดลอกได้ กรุณาคัดลอกด้วยตนเอง"));
+  }
+}
+
+function testShortLink() {
+  const shortLink = document.getElementById("shortLink").value;
+  const statusSpan = document.getElementById("linkStatus");
+  if (shortLink) {
+    if (statusSpan.textContent.includes("✅")) { window.open(shortLink, "_blank"); }
+    else { alert("⚠️ นี่เป็นลิงก์จำลอง ไม่สามารถเปิดได้จริง\n\nกด 'สร้างลิงก์สั้น' อีกครั้งเพื่อลองใหม่"); }
+  }
+}
+
+function generateQRFromShort() {
+  const shortLink = document.getElementById("shortLink").value;
+  if (shortLink) { document.getElementById("qrText").value = shortLink; showSection("qr"); generateQR(); }
+}
+
+function saveSettings() { alert("บันทึกการตั้งค่าเสร็จสิ้น!"); }
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const href = link.getAttribute("href");
+      if (href.startsWith("#")) { const id = href.substring(1); showSection(id); window.location.hash = href; }
+    });
+  });
+
+  const urlTypeSelect = document.getElementById("urlType");
+  if (urlTypeSelect) {
+    urlTypeSelect.addEventListener("change", (e) => {
+      const customDiv = document.getElementById("customCodeDiv");
+      e.target.value === "custom" ? customDiv.classList.remove("hidden") : customDiv.classList.add("hidden");
+    });
+  }
+
+  const logoUploadInput = document.getElementById("logoUpload");
+  if (logoUploadInput) {
+    logoUploadInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) { alert("กรุณาเลือกไฟล์รูปภาพเท่านั้น"); return; }
+      if (file.size > 5 * 1024 * 1024) { alert("ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB"); return; }
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        logoImage = event.target.result;
         const img = new Image();
-        img.onload = () => {
-          console.log("Logo image loads successfully:", img.width, "x", img.height);
-        };
-        img.onerror = () => {
-          console.error("Logo image failed to load");
-        };
+        img.onload = () => { if (document.getElementById("qrText").value.trim()) generateQR(); };
+        img.onerror = () => { alert("ไฟล์รูปภาพไม่ถูกต้อง"); logoImage = null; };
         img.src = logoImage;
-      } else {
-        console.log("No logo image available");
-      }
-    }
-
-    // Short URL Functions
-    async function shortenURL() {
-      const longUrl = document.getElementById("longUrl").value.trim();
-      const urlType = document.getElementById("urlType").value;
-      const customCode = document.getElementById("customCode").value.trim();
-      const resultDiv = document.getElementById("shortResult");
-      const shortLinkInput = document.getElementById("shortLink");
-      const lengthSpan = document.getElementById("linkLength");
-      const button = document.querySelector('button[onclick="shortenURL()"]');
-
-      if (!longUrl) {
-        alert("กรุณากรอกลิงก์ก่อน");
-        return;
-      }
-
-      if (!longUrl.startsWith("http://") && !longUrl.startsWith("https://")) {
-        alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://example.com");
-        return;
-      }
-
-      // Show loading state
-      button.disabled = true;
-      button.textContent = "กำลังสร้าง...";
-
-      let shortLink = "";
-
-      try {
-        if (urlType === "custom" && customCode) {
-          shortLink = await createCustomShortURL(longUrl, customCode);
-        } else if (urlType === "readable") {
-          shortLink = await createReadableShortURL(longUrl);
-        } else {
-          shortLink = await createAutoShortURL(longUrl);
-        }
-
-        shortLinkInput.value = shortLink;
-        lengthSpan.textContent = shortLink.length;
-        resultDiv.classList.remove("hidden");
-
-      } catch (error) {
-        console.error("Error:", error);
-        alert("เกิดข้อผิดพลาด: " + error.message);
-      }
-
-      // Reset button state
-      button.disabled = false;
-      button.textContent = "สร้างลิงก์สั้น";
-    }
-
-    async function createAutoShortURL(longUrl) {
-      // Try real ultra-short services first
-      const realAPIs = [
-        {
-          name: "TinyURL",
-          url: `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`,
-          method: "GET",
-          parser: (response) => response.text(),
-          isReal: true
-        },
-        {
-          name: "is.gd", 
-          url: `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
-          method: "GET",
-          parser: (response) => response.text(),
-          isReal: true
-        }
-      ];
-
-      // Try real APIs first
-      for (const api of realAPIs) {
-        try {
-          console.log(`Trying ${api.name}...`);
-          
-          const response = await fetch(api.url, {
-            method: api.method,
-            mode: 'cors'
-          });
-
-          if (!response.ok) continue;
-
-          const shortLink = await api.parser(response);
-          
-          if (shortLink && shortLink.startsWith('http')) {
-            updateLinkStatus(true);
-            return shortLink;
-          }
-        } catch (error) {
-          console.error(`${api.name} failed:`, error);
-          continue;
-        }
-      }
-
-      // If all real APIs fail, show mock with warning
-      updateLinkStatus(false);
-      return generateUltraShortFallback(longUrl);
-    }
-
-    async function createCustomShortURL(longUrl, customCode) {
-      // Try TinyURL with custom alias first
-      try {
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}&alias=${customCode}`, {
-          mode: 'cors'
-        });
-        const result = await response.text();
-        if (result.startsWith('http') && !result.includes('Error')) {
-          updateLinkStatus(true);
-          return result;
-        }
-      } catch (error) {
-        console.error("Custom TinyURL failed:", error);
-      }
-      
-      // Fallback to mock
-      updateLinkStatus(false);
-      return `https://s.ly/${customCode}`;
-    }
-
-    async function createReadableShortURL(longUrl) {
-      // Try TinyURL first
-      try {
-        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`, {
-          mode: 'cors'
-        });
-        const result = await response.text();
-        if (result.startsWith('http')) {
-          updateLinkStatus(true);
-          return result;
-        }
-      } catch (error) {
-        // Fallback to mock readable URL
-      }
-
-      // Extract readable part from URL for mock
-      const url = new URL(longUrl);
-      const pathParts = url.pathname.split('/').filter(p => p.length > 0);
-      const readable = pathParts[pathParts.length - 1] || url.hostname.split('.')[0];
-      const cleanReadable = readable.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
-      
-      updateLinkStatus(false);
-      return `https://go.to/${cleanReadable}`;
-    }
-
-    function updateLinkStatus(isReal) {
-      const statusSpan = document.getElementById("linkStatus");
-      const warningDiv = document.getElementById("warningMessage");
-      
-      if (isReal) {
-        statusSpan.textContent = "✅ ใช้งานได้จริง";
-        statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-green-100 text-green-800";
-        warningDiv.classList.add("hidden");
-      } else {
-        statusSpan.textContent = "⚠️ จำลอง";
-        statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-orange-100 text-orange-800";
-        warningDiv.classList.remove("hidden");
-      }
-    }
-
-    function generateUltraShort() {
-      const longUrl = document.getElementById("longUrl").value.trim();
-      
-      if (!longUrl) {
-        alert("กรุณากรอกลิงก์ก่อน");
-        return;
-      }
-
-      if (!longUrl.startsWith("http://") && !longUrl.startsWith("https://")) {
-        alert("กรุณาใส่ URL ที่ถูกต้อง เช่น https://example.com");
-        return;
-      }
-
-      // Show it's a mock for demonstration
-      const ultraShort = generateUltraShortFallback(longUrl);
-      document.getElementById("shortLink").value = ultraShort;
-      document.getElementById("linkLength").textContent = ultraShort.length;
-      document.getElementById("shortResult").classList.remove("hidden");
-      
-      // Always show as mock for ultra short demo
-      updateLinkStatus(false);
-    }
-
-    function generateUltraShortFallback(longUrl) {
-      // Create ultra-short URLs for demo purposes (showing potential length)
-      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      const hash = btoa(longUrl).replace(/[^a-zA-Z0-9]/g, '');
-      let short = '';
-      
-      for (let i = 0; i < 4; i++) {
-        short += chars[hash.charCodeAt(i) % chars.length];
-      }
-      
-      return `s.ly/${short}`; // Demo: 8 characters total
-    }
-
-    function copyShortLink() {
-      const shortLinkInput = document.getElementById("shortLink");
-      shortLinkInput.select();
-      shortLinkInput.setSelectionRange(0, 99999);
-      
-      try {
-        document.execCommand("copy");
-        alert("คัดลอกลิงก์สั้นแล้ว!");
-      } catch (err) {
-        // Fallback for modern browsers
-        navigator.clipboard.writeText(shortLinkInput.value).then(() => {
-          alert("คัดลอกลิงก์สั้นแล้ว!");
-        }).catch(() => {
-          alert("ไม่สามารถคัดลอกได้ กรุณาคัดลอกด้วยตนเอง");
-        });
-      }
-    }
-
-    function testShortLink() {
-      const shortLink = document.getElementById("shortLink").value;
-      const statusSpan = document.getElementById("linkStatus");
-      
-      if (shortLink) {
-        // Check if it's a real link
-        if (statusSpan.textContent.includes("✅")) {
-          window.open(shortLink, '_blank');
-        } else {
-          alert("⚠️ นี่เป็นลิงก์จำลอง ไม่สามารถเปิดได้จริง\n\nใช้ปุ่ม 'สร้างลิงก์สั้น' แบบ 'สั้นที่สุด (Auto)' เพื่อได้ลิงก์จริง");
-        }
-      }
-    }
-
-    function generateQRFromShort() {
-      const shortLink = document.getElementById("shortLink").value;
-      if (shortLink) {
-        document.getElementById("qrText").value = shortLink;
-        showSection("qr");
-        generateQR();
-      }
-    }
-
-    // PDF Tools Functions
-    function showPdfTool(toolType) {
-      console.log('showPdfTool called with:', toolType);
-      
-      // Hide all PDF tools
-      document.querySelectorAll('.pdf-tool').forEach(tool => {
-        tool.classList.add('hidden');
-      });
-      
-      // Remove active state from all buttons
-      document.querySelectorAll('.pdf-tool-btn').forEach(btn => {
-        btn.classList.remove('border-blue-500', 'bg-blue-50');
-        btn.classList.add('border-gray-200');
-      });
-      
-      // Show selected tool
-      const targetTool = document.getElementById(`pdf-${toolType}`);
-      if (targetTool) {
-        targetTool.classList.remove('hidden');
-        console.log('Showing tool:', toolType);
-      } else {
-        console.error('Tool not found:', `pdf-${toolType}`);
-      }
-      
-      // Add active state to clicked button
-      const clickedBtn = document.querySelector(`[data-tool="${toolType}"]`);
-      if (clickedBtn) {
-        clickedBtn.classList.add('border-blue-500', 'bg-blue-50');
-        clickedBtn.classList.remove('border-gray-200');
-      }
-    }
-
-    function handleMergeFiles(e) {
-      console.log('handleMergeFiles called');
-      const files = Array.from(e.target.files);
-      const fileList = document.getElementById('mergeFileList');
-      const list = document.getElementById('mergeList');
-      
-      if (files.length > 0) {
-        fileList.classList.remove('hidden');
-        list.innerHTML = '';
-        
-        files.forEach((file, index) => {
-          const item = document.createElement('div');
-          item.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
-          item.innerHTML = `
-            <span class="text-sm">${index + 1}. ${file.name}</span>
-            <span class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
-          `;
-          list.appendChild(item);
-        });
-      } else {
-        fileList.classList.add('hidden');
-      }
-    }
-
-    function handleSplitFile(e) {
-      console.log('handleSplitFile called');
-      const file = e.target.files[0];
-      const options = document.getElementById('splitOptions');
-      
-      if (file) {
-        options.classList.remove('hidden');
-      } else {
-        options.classList.add('hidden');
-      }
-    }
-
-    function handleCompressFile(e) {
-      console.log('handleCompressFile called');
-      const file = e.target.files[0];
-      const sizeDiv = document.getElementById('originalSize');
-      
-      if (file) {
-        const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-        sizeDiv.textContent = `ขนาดไฟล์ต้นฉบับ: ${sizeMB} MB`;
-        sizeDiv.classList.remove('hidden');
-      } else {
-        sizeDiv.classList.add('hidden');
-      }
-    }
-
-    function handleConvertFile(e) {
-      console.log('handleConvertFile called');
-      const file = e.target.files[0];
-      updateConvertOptions();
-    }
-
-    function updateConvertOptions() {
-      const convertTo = document.getElementById('convertTo').value;
-      const options = document.getElementById('convertOptions');
-      
-      if (convertTo === 'image') {
-        options.classList.remove('hidden');
-      } else {
-        options.classList.add('hidden');
-      }
-    }
-
-    async function mergePDFs() {
-      console.log('mergePDFs called');
-      const files = document.getElementById('mergeFiles').files;
-      const progress = document.getElementById('mergeProgress');
-      const progressBar = document.getElementById('mergeProgressBar');
-      
-      if (files.length < 2) {
-        alert('กรุณาเลือกไฟล์ PDF อย่างน้อย 2 ไฟล์');
-        return;
-      }
-      
-      if (typeof PDFLib === 'undefined') {
-        alert('ไลบรารี PDF ยังไม่โหลดเสร็จ กรุณารอสักครู่แล้วลองใหม่');
-        return;
-      }
-      
-      try {
-        progress.classList.remove('hidden');
-        progressBar.style.width = '10%';
-        
-        const mergedPdf = await PDFLib.PDFDocument.create();
-        
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
-          const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-          
-          pages.forEach(page => mergedPdf.addPage(page));
-          
-          progressBar.style.width = `${((i + 1) / files.length) * 80 + 10}%`;
-        }
-        
-        progressBar.style.width = '95%';
-        
-        const pdfBytes = await mergedPdf.save();
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `merged-pdf-${Date.now()}.pdf`;
-        a.click();
-        
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-          progress.classList.add('hidden');
-          progressBar.style.width = '0%';
-          alert('รวม PDF เสร็จสิ้น!');
-        }, 1000);
-        
-      } catch (error) {
-        console.error('Error merging PDFs:', error);
-        alert('เกิดข้อผิดพลาดในการรวม PDF: ' + error.message);
-        progress.classList.add('hidden');
-      }
-    }
-
-    async function splitPDF() {
-      console.log('splitPDF called');
-      const file = document.getElementById('splitFile').files[0];
-      const splitType = document.querySelector('input[name="splitType"]:checked').value;
-      const pageRange = document.getElementById('pageRange').value;
-      
-      if (!file) {
-        alert('กรุณาเลือกไฟล์ PDF');
-        return;
-      }
-      
-      if (typeof PDFLib === 'undefined') {
-        alert('ไลบรารี PDF ยังไม่โหลดเสร็จ กรุณารอสักครู่แล้วลองใหม่');
-        return;
-      }
-      
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
-        const totalPages = pdf.getPageCount();
-        
-        console.log('Total pages:', totalPages);
-        
-        if (splitType === 'pages') {
-          // Split into individual pages
-          for (let i = 0; i < totalPages; i++) {
-            const newPdf = await PDFLib.PDFDocument.create();
-            const [page] = await newPdf.copyPages(pdf, [i]);
-            newPdf.addPage(page);
-            
-            const pdfBytes = await newPdf.save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `page-${i + 1}.pdf`;
-            a.click();
-            
-            // Small delay between downloads
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-        } else if (splitType === 'range' && pageRange) {
-          // Split by range
-          const ranges = pageRange.split(',').map(r => r.trim());
-          
-          for (const range of ranges) {
-            const [start, end] = range.split('-').map(n => parseInt(n.trim()) - 1);
-            
-            if (start >= 0 && end < totalPages && start <= end) {
-              const newPdf = await PDFLib.PDFDocument.create();
-              const pages = await newPdf.copyPages(pdf, Array.from({length: end - start + 1}, (_, i) => start + i));
-              pages.forEach(page => newPdf.addPage(page));
-              
-              const pdfBytes = await newPdf.save();
-              const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-              const url = URL.createObjectURL(blob);
-              
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `pages-${start + 1}-to-${end + 1}.pdf`;
-              a.click();
-              
-              await new Promise(resolve => setTimeout(resolve, 100));
-            }
-          }
-        }
-        
-        alert('แยก PDF เสร็จสิ้น!');
-        
-      } catch (error) {
-        console.error('Error splitting PDF:', error);
-        alert('เกิดข้อผิดพลาดในการแยก PDF: ' + error.message);
-      }
-    }
-
-    async function compressPDF() {
-      console.log('compressPDF called');
-      const file = document.getElementById('compressFile').files[0];
-      const level = document.getElementById('compressionLevel').value;
-      
-      if (!file) {
-        alert('กรุณาเลือกไฟล์ PDF');
-        return;
-      }
-      
-      if (typeof PDFLib === 'undefined') {
-        alert('ไลบรารี PDF ยังไม่โหลดเสร็จ กรุณารอสักครู่แล้วลองใหม่');
-        return;
-      }
-      
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
-        
-        // Simple compression by re-saving with different options
-        const pdfBytes = await pdf.save({
-          useObjectStreams: level !== 'low',
-          addDefaultPage: false,
-          objectsPerTick: level === 'high' ? 50 : level === 'medium' ? 30 : 20
-        });
-        
-        const originalSize = file.size;
-        const compressedSize = pdfBytes.length;
-        const compressionRatio = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
-        
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `compressed-${file.name}`;
-        a.click();
-        
-        const resultDiv = document.getElementById('compressResult');
-        const statsDiv = document.getElementById('compressionStats');
-        statsDiv.innerHTML = `
-          <p>ขนาดเดิม: ${(originalSize / 1024 / 1024).toFixed(2)} MB</p>
-          <p>ขนาดหลังบีบอัด: ${(compressedSize / 1024 / 1024).toFixed(2)} MB</p>
-          <p>ลดลง: ${compressionRatio >= 0 ? compressionRatio : 0}%</p>
-        `;
-        resultDiv.classList.remove('hidden');
-        
-        alert('บีบอัด PDF เสร็จสิ้น!');
-        
-      } catch (error) {
-        console.error('Error compressing PDF:', error);
-        alert('เกิดข้อผิดพลาดในการบีบอัด PDF: ' + error.message);
-      }
-    }
-
-    async function convertFile() {
-      console.log('convertFile called');
-      const file = document.getElementById('convertFile').files[0];
-      const convertFrom = document.getElementById('convertFrom').value;
-      const convertTo = document.getElementById('convertTo').value;
-      
-      if (!file) {
-        alert('กรุณาเลือกไฟล์');
-        return;
-      }
-      
-      try {
-        if (convertFrom === 'image' && convertTo === 'pdf') {
-          await convertImageToPDF(file);
-        } else if (convertFrom === 'pdf' && convertTo === 'image') {
-          await convertPDFToImage(file);
-        } else {
-          alert('การแปลงนี้ยังไม่รองรับ กรุณาใช้เครื่องมือออนไลน์อื่น');
-        }
-      } catch (error) {
-        console.error('Error converting file:', error);
-        alert('เกิดข้อผิดพลาดในการแปลงไฟล์: ' + error.message);
-      }
-    }
-
-    async function convertImageToPDF(imageFile) {
-      console.log('convertImageToPDF called');
-      
-      if (typeof PDFLib === 'undefined') {
-        alert('ไลบรารี PDF ยังไม่โหลดเสร็จ กรุณารอสักครู่แล้วลองใหม่');
-        return;
-      }
-      
-      const pdf = await PDFLib.PDFDocument.create();
-      const imageBytes = await imageFile.arrayBuffer();
-      
-      let image;
-      if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
-        image = await pdf.embedJpg(imageBytes);
-      } else if (imageFile.type === 'image/png') {
-        image = await pdf.embedPng(imageBytes);
-      } else {
-        throw new Error('รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
-      }
-      
-      const page = pdf.addPage([image.width, image.height]);
-      page.drawImage(image, {
-        x: 0,
-        y: 0,
-        width: image.width,
-        height: image.height,
-      });
-      
-      const pdfBytes = await pdf.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `converted-${imageFile.name.split('.')[0]}.pdf`;
-      a.click();
-      
-      alert('แปลงรูปภาพเป็น PDF เสร็จสิ้น!');
-    }
-
-    async function convertPDFToImage(pdfFile) {
-      alert('การแปลง PDF เป็นรูปภาพต้องใช้เครื่องมือเพิ่มเติม\nแนะนำให้ใช้เว็บไซต์ออนไลน์เช่น SmallPDF หรือ ILovePDF');
-    }
-
-    // Settings Functions (placeholder)
-    function saveSettings() {
-      alert('บันทึกการตั้งค่าเสร็จสิ้น!');
-    }
-
-    function applySettings() {
-      alert('ใช้การตั้งค่าเสร็จสิ้น!');
-    }
-
-    function exportSettings() {
-      alert('ส่งออกการตั้งค่าเสร็จสิ้น!');
-    }
-
-    function importSettings() {
-      alert('นำเข้าการตั้งค่าเสร็จสิ้น!');
-    }
-
-    function resetSettings() {
-      if (confirm('คุณต้องการรีเซ็ตการตั้งค่าหรือไม่?')) {
-        alert('รีเซ็ตการตั้งค่าเสร็จสิ้น!');
-      }
-    }
-
-    // Event Listeners - Fixed
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log('DOM loaded, setting up event listeners');
-
-      // Handle navigation clicks
-      document.querySelectorAll(".nav-link").forEach(link => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const href = link.getAttribute("href");
-          console.log('Navigation clicked:', href);
-          if (href.startsWith("#")) {
-            const sectionId = href.substring(1);
-            showSection(sectionId);
-            window.location.hash = href;
-          }
-        });
-      });
-
-      // URL Type change handler
-      const urlTypeSelect = document.getElementById("urlType");
-      if (urlTypeSelect) {
-        urlTypeSelect.addEventListener("change", (e) => {
-          const customDiv = document.getElementById("customCodeDiv");
-          if (e.target.value === "custom") {
-            customDiv.classList.remove("hidden");
-          } else {
-            customDiv.classList.add("hidden");
-          }
-        });
-      }
-
-      // Logo upload handler
-      const logoUploadInput = document.getElementById("logoUpload");
-      if (logoUploadInput) {
-        logoUploadInput.addEventListener("change", async (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            console.log("Logo file selected:", file.name, file.type, file.size);
-            
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-              alert("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
-              return;
-            }
-            
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-              alert("ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB");
-              return;
-            }
-            
-            try {
-              const reader = new FileReader();
-              reader.onload = async (event) => {
-                logoImage = event.target.result;
-                console.log("Logo loaded successfully, size:", logoImage.length);
-                
-                // Test if image loads properly
-                const img = new Image();
-                img.onload = () => {
-                  console.log("Logo image validated:", img.width, "x", img.height);
-                  
-                  // Auto-regenerate QR if text exists
-                  if (document.getElementById("qrText").value.trim()) {
-                    console.log("Auto-regenerating QR with logo");
-                    generateQR();
-                  } else {
-                    console.log("No text yet, logo ready for next generation");
-                  }
-                };
-                img.onerror = () => {
-                  console.error("Logo image failed to validate");
-                  alert("ไฟล์รูปภาพไม่ถูกต้อง กรุณาลองใหม่");
-                  logoImage = null;
-                };
-                img.src = logoImage;
-              };
-              
-              reader.onerror = () => {
-                console.error("Failed to read logo file");
-                alert("ไม่สามารถอ่านไฟล์รูปภาพได้");
-              };
-              
-              reader.readAsDataURL(file);
-            } catch (error) {
-              console.error("Error processing logo:", error);
-              alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ");
-            }
-          }
-        });
-      }
-
-      // Handle split type change
-      document.addEventListener('change', (e) => {
-        if (e.target.name === 'splitType') {
-          const rangeInput = document.getElementById('rangeInput');
-          if (e.target.value === 'range') {
-            rangeInput.classList.remove('hidden');
-          } else {
-            rangeInput.classList.add('hidden');
-          }
-        }
-      });
-
-      // Handle convert from/to change
-      const convertFromSelect = document.getElementById('convertFrom');
-      const convertToSelect = document.getElementById('convertTo');
-      
-      if (convertFromSelect && convertToSelect) {
-        convertFromSelect.addEventListener('change', updateConvertOptions);
-        convertToSelect.addEventListener('change', updateConvertOptions);
-      }
-
-      // Handle file uploads for PDF tools
-      const mergeFilesInput = document.getElementById('mergeFiles');
-      const splitFileInput = document.getElementById('splitFile'); 
-      const compressFileInput = document.getElementById('compressFile');
-      const convertFileInput = document.getElementById('convertFile');
-
-      if (mergeFilesInput) {
-        mergeFilesInput.addEventListener('change', handleMergeFiles);
-      }
-      if (splitFileInput) {
-        splitFileInput.addEventListener('change', handleSplitFile);
-      }
-      if (compressFileInput) {
-        compressFileInput.addEventListener('change', handleCompressFile);
-      }
-      if (convertFileInput) {
-        convertFileInput.addEventListener('change', handleConvertFile);
-      }
-
-      // Test PDF library loading
-      setTimeout(() => {
-        if (typeof PDFLib !== 'undefined') {
-          console.log('PDF-lib loaded successfully');
-        } else {
-          console.error('PDF-lib failed to load');
-        }
-      }, 2000);
-
-      // Handle initial hash
-      const hash = window.location.hash;
-      if (hash) {
-        const sectionId = hash.substring(1);
-        showSection(sectionId);
-      } else {
-        showSection("qr"); // Default to QR section
-      }
-
-      console.log('All event listeners set up successfully');
+      };
+      reader.readAsDataURL(file);
     });
+  }
 
-    // Handle hash changes
-    window.addEventListener("hashchange", () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const sectionId = hash.substring(1);
-        showSection(sectionId);
-      }
-    });
+  const hash = window.location.hash;
+  showSection(hash ? hash.substring(1) : "qr");
+});
 
-    // Enter key support for inputs
-    document.addEventListener("DOMContentLoaded", () => {
-      const qrTextInput = document.getElementById("qrText");
-      const longUrlInput = document.getElementById("longUrl");
-      
-      if (qrTextInput) {
-        qrTextInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter") generateQR();
-        });
-      }
+window.addEventListener("hashchange", () => {
+  const hash = window.location.hash;
+  if (hash) showSection(hash.substring(1));
+});
 
-      if (longUrlInput) {
-        longUrlInput.addEventListener("keypress", (e) => {
-          if (e.key === "Enter") shortenURL();
-        });
-      }
-    });
+document.addEventListener("DOMContentLoaded", () => {
+  const qrTextInput = document.getElementById("qrText");
+  const longUrlInput = document.getElementById("longUrl");
+  if (qrTextInput) qrTextInput.addEventListener("keypress", e => { if (e.key === "Enter") generateQR(); });
+  if (longUrlInput) longUrlInput.addEventListener("keypress", e => { if (e.key === "Enter") shortenURL(); });
+});
+</script>
 
-    // Mobile menu toggle (for future enhancement)
-    function toggleMobileMenu() {
-      const sidebar = document.querySelector('aside');
-      sidebar.classList.toggle('hidden');
-    }
-
-    console.log('Script loaded successfully');
-  </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  // Hamburger menu & sidebar toggle
   const mobileMenuBtn = document.getElementById("mobileMenuBtn");
   const sidebar = document.getElementById("sidebar");
-
   if (mobileMenuBtn && sidebar) {
-    // เปิด/ปิด sidebar
-    mobileMenuBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      sidebar.classList.toggle("-translate-x-full");
+    mobileMenuBtn.addEventListener("click", function(e) { e.stopPropagation(); sidebar.classList.toggle("-translate-x-full"); });
+    document.addEventListener("click", function(e) {
+      if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target) && window.innerWidth < 768) sidebar.classList.add("-translate-x-full");
     });
-
-    // ปิด sidebar เมื่อคลิกที่อื่น (เฉพาะบนมือถือ)
-    document.addEventListener("click", function (e) {
-      if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target) && window.innerWidth < 768) {
-        sidebar.classList.add("-translate-x-full");
-      }
-    });
-
-    // ถ้าเปลี่ยนขนาดจอ (เช่น หมุนมือถือแนวนอน) ให้ปิด sidebar อัตโนมัติถ้าจอกลับไปเล็ก
-    window.addEventListener("resize", function () {
-      if (window.innerWidth < 768) {
-        sidebar.classList.add("-translate-x-full");
-      }
-    });
+    window.addEventListener("resize", function() { if (window.innerWidth < 768) sidebar.classList.add("-translate-x-full"); });
   }
 });
 </script>
 
-
-<!-- OAE Usage Audit (Google Sheets / Apps Script) -->
+<!-- OAE Usage Audit -->
 <script>
-/**
- * OAE Usage Audit (client-side) — safe telemetry
- * - Works on GitHub Pages / Vercel static hosting
- * - Sends events to Google Apps Script Web App (/exec)
- * - Does NOT send file names, document content, or QR payloads
- *
- * IMPORTANT: Replace the placeholder below with your Apps Script Web App URL (ends with /exec)
- * Example:
- *   window.OAE_AUDIT_ENDPOINT = "https://script.google.com/macros/s/XXXX/exec";
- */
 (function () {
-  if (typeof window.OAE_AUDIT_ENDPOINT === 'undefined') {
-    window.OAE_AUDIT_ENDPOINT = "PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
-  }
-
+  if (typeof window.OAE_AUDIT_ENDPOINT === 'undefined') window.OAE_AUDIT_ENDPOINT = "PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
   const TZ = "Asia/Bangkok";
-
-  function getDayBkk(d) {
-    d = d || new Date();
-    try {
-      const parts = new Intl.DateTimeFormat("en-CA", {
-        timeZone: TZ,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      }).formatToParts(d);
-      const y = parts.find(p => p.type === "year").value;
-      const m = parts.find(p => p.type === "month").value;
-      const da = parts.find(p => p.type === "day").value;
-      return y + "-" + m + "-" + da;
-    } catch (e) {
-      // Fallback (UTC)
-      return d.toISOString().slice(0, 10);
-    }
-  }
-
-  function readLS(key) {
-    try { return localStorage.getItem(key) || ""; } catch (e) { return ""; }
-  }
-  function writeLS(key, val) {
-    try { localStorage.setItem(key, val); } catch (e) {}
-  }
-  function readSS(key) {
-    try { return sessionStorage.getItem(key) || ""; } catch (e) { return ""; }
-  }
-  function writeSS(key, val) {
-    try { sessionStorage.setItem(key, val); } catch (e) {}
-  }
-
-  function normEndpoint(ep) {
-    ep = (ep || "").trim();
-    if (!ep) return "";
-    if (ep.indexOf("PASTE_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE") !== -1) return "";
-    if (ep.indexOf("PASTE_") === 0) return "";
-    return ep;
-  }
-
-  function getEndpoint() {
-    const qs = new URLSearchParams(location.search);
-    const epQS = normEndpoint(qs.get("audit_endpoint") || "");
-    if (epQS) writeLS("oae_audit_endpoint", epQS);
-
-    const ep1 = normEndpoint(String(window.OAE_AUDIT_ENDPOINT || ""));
-    const ep2 = normEndpoint(readLS("oae_audit_endpoint"));
-    return ep1 || ep2 || epQS || "";
-  }
-
+  function getDayBkk(d) { d = d || new Date(); try { const p = new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d); return p.find(x=>x.type==="year").value+"-"+p.find(x=>x.type==="month").value+"-"+p.find(x=>x.type==="day").value; } catch(e) { return d.toISOString().slice(0,10); } }
+  function readLS(k) { try { return localStorage.getItem(k)||""; } catch(e){return "";} }
+  function writeLS(k,v) { try { localStorage.setItem(k,v); } catch(e){} }
+  function readSS(k) { try { return sessionStorage.getItem(k)||""; } catch(e){return "";} }
+  function writeSS(k,v) { try { sessionStorage.setItem(k,v); } catch(e){} }
+  function normEndpoint(ep) { ep=(ep||"").trim(); if(!ep||ep.indexOf("PASTE_")===0) return ""; return ep; }
+  function getEndpoint() { const qs=new URLSearchParams(location.search); const epQS=normEndpoint(qs.get("audit_endpoint")||""); if(epQS) writeLS("oae_audit_endpoint",epQS); return normEndpoint(String(window.OAE_AUDIT_ENDPOINT||""))||normEndpoint(readLS("oae_audit_endpoint"))||epQS||""; }
   const endpoint = getEndpoint();
-
-  function uuidFallback() {
-    return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-  }
-
-  const visitorId = (function () {
-    let v = readLS("oae_vid");
-    if (!v) {
-      try { v = (crypto && crypto.randomUUID) ? crypto.randomUUID() : uuidFallback(); }
-      catch (e) { v = uuidFallback(); }
-      writeLS("oae_vid", v);
-    }
-    return v || "anon";
-  })();
-
-  const sessionId = (function () {
-    let s = readSS("oae_sid");
-    if (!s) {
-      try { s = (crypto && crypto.randomUUID) ? crypto.randomUUID() : uuidFallback(); }
-      catch (e) { s = uuidFallback(); }
-      writeSS("oae_sid", s);
-    }
-    return s || "session";
-  })();
-
+  function uuidFallback() { return String(Date.now())+"-"+Math.random().toString(16).slice(2); }
+  const visitorId = (function(){let v=readLS("oae_vid");if(!v){try{v=(crypto&&crypto.randomUUID)?crypto.randomUUID():uuidFallback();}catch(e){v=uuidFallback();}writeLS("oae_vid",v);}return v||"anon";})();
+  const sessionId = (function(){let s=readSS("oae_sid");if(!s){try{s=(crypto&&crypto.randomUUID)?crypto.randomUUID():uuidFallback();}catch(e){s=uuidFallback();}writeSS("oae_sid",s);}return s||"session";})();
   function send(eventName, payload) {
     if (!endpoint) return;
-
     payload = payload || {};
-    const body = {
-      ts_iso: new Date().toISOString(),
-      day_bkk: getDayBkk(),
-      site: location.origin || "",
-      path: location.pathname || "",
-      page: document.title || "",
-      event: String(eventName || ""),
-      action: String(payload.action || ""),
-      tool: String(payload.tool || ""),
-      fn: String(payload.fn || ""),
-      visitor_id: visitorId,
-      session_id: sessionId,
-      referrer: document.referrer || "",
-      ua: navigator.userAgent || "",
-      extra: payload.extra ? payload.extra : null
-    };
-
-    // Prefer sendBeacon (non-blocking, good for unload)
-    try {
-      const blob = new Blob([JSON.stringify(body)], { type: "text/plain" });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(endpoint, blob);
-        return;
-      }
-    } catch (e) {}
-
-    // Fallback fetch
-    try {
-      fetch(endpoint, { method: "POST", body: JSON.stringify(body), keepalive: true }).catch(function(){});
-    } catch (e) {}
+    const body = { ts_iso:new Date().toISOString(), day_bkk:getDayBkk(), site:location.origin||"", path:location.pathname||"", page:document.title||"", event:String(eventName||""), action:String(payload.action||""), tool:String(payload.tool||""), fn:String(payload.fn||""), visitor_id:visitorId, session_id:sessionId, referrer:document.referrer||"", ua:navigator.userAgent||"", extra:payload.extra||null };
+    try { const blob=new Blob([JSON.stringify(body)],{type:"text/plain"}); if(navigator.sendBeacon){navigator.sendBeacon(endpoint,blob);return;} } catch(e){}
+    try { fetch(endpoint,{method:"POST",body:JSON.stringify(body),keepalive:true}).catch(function(){}); } catch(e){}
   }
-
-  // expose small API
-  window.OAE_AUDIT = {
-    endpoint: endpoint,
-    visitorId: visitorId,
-    sessionId: sessionId,
-    send: send
-  };
-
-  // page view
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      send("page_view", { action: "view" });
-    }, { once: true });
-  } else {
-    send("page_view", { action: "view" });
+  window.OAE_AUDIT = { endpoint:endpoint, visitorId:visitorId, sessionId:sessionId, send:send };
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){send("page_view",{action:"view"});},{once:true});}else{send("page_view",{action:"view"});}
+  function wrapFn(fnName,eventName,mapper){
+    try{const orig=window[fnName];if(typeof orig!=="function")return;if(orig.__oae_wrapped)return;function wrapped(){try{let info=mapper?mapper.apply(this,arguments):{};info=info||{};info.fn=fnName;send(eventName,info);}catch(e){}return orig.apply(this,arguments);}wrapped.__oae_wrapped=true;window[fnName]=wrapped;}catch(e){}
   }
-
-  // wrap functions safely (no structural changes)
-  function wrapFn(fnName, eventName, mapper) {
-    try {
-      const orig = window[fnName];
-      if (typeof orig !== "function") return;
-      if (orig.__oae_wrapped) return;
-
-      function wrapped() {
-        try {
-          const info = mapper ? mapper.apply(this, arguments) : {};
-          info = info || {};
-          info.fn = fnName;
-          send(eventName, info);
-        } catch (e) {}
-        return orig.apply(this, arguments);
-      }
-
-      wrapped.__oae_wrapped = true;
-      window[fnName] = wrapped;
-    } catch (e) {}
-  }
-
-  // PDF Tool page (tool switch)
-  wrapFn("openTool", "tool_open", function (toolId) {
-    return { tool: String(toolId || "") };
-  });
-
-  // QR / Index page (tool switch)
-  wrapFn("showPdfTool", "tool_open", function (toolId) {
-    return { tool: String(toolId || "") };
-  });
-
-  // Common actions (if present)
-  wrapFn("mergePDFs", "action", function () { return { action: "merge_pdfs" }; });
-  wrapFn("splitPDF", "action", function () { return { action: "split_pdf" }; });
-  wrapFn("shortenURL", "action", function () { return { action: "shorten_url" }; });
-
-  // JS errors
-  window.addEventListener("error", function (e) {
-    try {
-      send("js_error", {
-        action: "error",
-        extra: {
-          message: String(e.message || ""),
-          source: String(e.filename || ""),
-          line: Number(e.lineno || 0),
-          col: Number(e.colno || 0)
-        }
-      });
-    } catch (_) {}
-  });
-
-  window.addEventListener("unhandledrejection", function (e) {
-    try {
-      const r = (e && e.reason) ? (e.reason.message || e.reason) : "unknown";
-      send("promise_rejection", { action: "rejection", extra: { reason: String(r) } });
-    } catch (_) {}
-  });
-
+  wrapFn("shortenURL","action",function(){return{action:"shorten_url"};});
+  window.addEventListener("error",function(e){try{send("js_error",{action:"error",extra:{message:String(e.message||""),source:String(e.filename||""),line:Number(e.lineno||0),col:Number(e.colno||0)}});}catch(_){}});
+  window.addEventListener("unhandledrejection",function(e){try{const r=(e&&e.reason)?(e.reason.message||e.reason):"unknown";send("promise_rejection",{action:"rejection",extra:{reason:String(r)}});}catch(_){}});
 })();
 </script>
 
