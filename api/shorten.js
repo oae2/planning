@@ -1,31 +1,73 @@
 // api/shorten.js — Vercel Serverless Function
 // วางไฟล์นี้ใน folder: api/shorten.js
-// Vercel จะ deploy เป็น endpoint: https://your-app.vercel.app/api/shorten
 
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'GET')     return res.status(405).json({ error: 'Method not allowed' });
 
   const { url, alias } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing ?url= parameter' });
 
+  // ── ตัด tracking parameters ที่ไม่จำเป็นออกก่อน ────────────
+  // เช่น ?usp=drive_link, ?usp=sharing ใน Google Drive
+  // เพิ่มโอกาสให้ URL shortener ยอมรับ URL
+  let cleanedUrl = url;
+  try {
+    const parsed = new URL(url);
+    // ลบ tracking params ที่รู้จัก
+    ['usp', 'utm_source', 'utm_medium', 'utm_campaign',
+     'utm_term', 'utm_content', 'fbclid', 'gclid', 'ref'].forEach(p => {
+      parsed.searchParams.delete(p);
+    });
+    // ถ้าเป็น Google Drive folder/file — ใช้ URL แบบ canonical
+    if (parsed.hostname === 'drive.google.com') {
+      // เก็บเฉพาะ path ที่จำเป็น
+      cleanedUrl = parsed.origin + parsed.pathname;
+    } else {
+      cleanedUrl = parsed.toString();
+    }
+  } catch (e) {
+    cleanedUrl = url; // ถ้า parse ไม่ได้ ใช้ URL เดิม
+  }
+
   const errors = [];
 
-  // ── 1. ลอง v.gd ────────────────────────────────────────────
+  // ── 1. TinyURL ─────────────────────────────────────────────
+  // redirect โดยตรง ไม่มีหน้าโฆษณาคั่น รองรับ Google Drive URL
   try {
-    let vgdUrl = `https://v.gd/create.php?format=simple&url=${encodeURIComponent(url)}`;
+    const tinyRes = await fetch(
+      `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cleanedUrl)}`,
+      {
+        headers: { 'User-Agent': 'Mozilla/5.0 OAE-URL-Shortener/1.0' },
+        signal: AbortSignal.timeout(8000)
+      }
+    );
+    if (tinyRes.ok) {
+      const text = (await tinyRes.text()).trim();
+      if (text.startsWith('http') && text.includes('tinyurl.com')) {
+        return res.status(200).json({ shortUrl: text, service: 'TinyURL' });
+      }
+      errors.push(`TinyURL: ${text.substring(0, 80)}`);
+    } else {
+      errors.push(`TinyURL: HTTP ${tinyRes.status}`);
+    }
+  } catch (e) {
+    errors.push(`TinyURL: ${e.message}`);
+  }
+
+  // ── 2. v.gd ────────────────────────────────────────────────
+  try {
+    let vgdUrl = `https://v.gd/create.php?format=simple&url=${encodeURIComponent(cleanedUrl)}`;
     if (alias) vgdUrl += `&shorturl=${encodeURIComponent(alias)}`;
 
     const vgdRes = await fetch(vgdUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0 OAE-URL-Shortener/1.0' },
       signal: AbortSignal.timeout(8000)
     });
-
     if (vgdRes.ok) {
       const text = (await vgdRes.text()).trim();
       if (text.startsWith('http')) {
@@ -39,16 +81,15 @@ export default async function handler(req, res) {
     errors.push(`v.gd: ${e.message}`);
   }
 
-  // ── 2. ลอง is.gd (พี่สาวของ v.gd) ─────────────────────────
+  // ── 3. is.gd ───────────────────────────────────────────────
   try {
-    let isgdUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`;
+    let isgdUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(cleanedUrl)}`;
     if (alias) isgdUrl += `&shorturl=${encodeURIComponent(alias)}`;
 
     const isgdRes = await fetch(isgdUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0 OAE-URL-Shortener/1.0' },
       signal: AbortSignal.timeout(8000)
     });
-
     if (isgdRes.ok) {
       const text = (await isgdRes.text()).trim();
       if (text.startsWith('http')) {
@@ -60,32 +101,6 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     errors.push(`is.gd: ${e.message}`);
-  }
-
-  // ── 3. ลอง cleanuri.com ─────────────────────────────────────
-  try {
-    const cleanRes = await fetch('https://cleanuri.com/api/v1/shorten', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 OAE-URL-Shortener/1.0'
-      },
-      body: `url=${encodeURIComponent(url)}`,
-      signal: AbortSignal.timeout(8000)
-    });
-
-    if (cleanRes.ok) {
-      const data = await cleanRes.json();
-      if (data && data.result_url) {
-        return res.status(200).json({ shortUrl: data.result_url, service: 'cleanuri.com' });
-      }
-      errors.push(`cleanuri.com: ${JSON.stringify(data).substring(0, 80)}`);
-    } else {
-      const errText = await cleanRes.text().catch(() => '');
-      errors.push(`cleanuri.com: HTTP ${cleanRes.status} ${errText.substring(0, 60)}`);
-    }
-  } catch (e) {
-    errors.push(`cleanuri.com: ${e.message}`);
   }
 
   // ── ทุก service ล้มเหลว ─────────────────────────────────────
