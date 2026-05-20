@@ -369,142 +369,92 @@ function testLogo() {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  SHORT URL FUNCTIONS — ใช้ v.gd + cleanuri.com (ไม่มีโฆษณา)
-//  รองรับทั้ง hosted server และ local file:// ผ่าน CORS proxy
+//  SHORT URL FUNCTIONS — เรียกผ่าน Vercel Serverless Function
+//  /api/shorten → proxy ไป v.gd / is.gd / cleanuri.com
+//  ไม่มีปัญหา CORS และไม่ถูก block จาก corporate network
 // ─────────────────────────────────────────────────────────────
 
-// ── ฟังก์ชัน fetch พร้อม CORS proxy fallback ──────────────────
-async function fetchWithFallback(directUrl, options) {
-  // รอบที่ 1: ลอง fetch ตรง
-  try {
-    const res = await fetch(directUrl, { ...options, mode: "cors", signal: AbortSignal.timeout(6000) });
-    if (res.ok) return res;
-  } catch (e) {
-    console.warn("Direct fetch failed:", e.message, "→ trying CORS proxy...");
-  }
-  // รอบที่ 2: ผ่าน CORS proxy (แก้ปัญหา file:// หรือ server block CORS)
-  try {
-    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(directUrl);
-    const res = await fetch(proxyUrl, { mode: "cors", signal: AbortSignal.timeout(8000) });
-    if (res.ok) return res;
-  } catch (e) {
-    console.warn("CORS proxy also failed:", e.message);
-  }
-  return null;
-}
+async function callShortenAPI(longUrl, alias) {
+  let apiUrl = '/api/shorten?url=' + encodeURIComponent(longUrl);
+  if (alias) apiUrl += '&alias=' + encodeURIComponent(alias);
 
-// ── v.gd helper ──────────────────────────────────────────────
-async function callVgd(longUrl, customAlias) {
-  let url = "https://v.gd/create.php?format=simple&url=" + encodeURIComponent(longUrl);
-  if (customAlias) url += "&shorturl=" + encodeURIComponent(customAlias);
-  const res = await fetchWithFallback(url, {});
-  if (!res) return null;
-  const text = (await res.text()).replace(/^\ufeff/, "").trim();
-  // v.gd returns error text like "Error: ..." on failure
-  if (!text.startsWith("http")) { console.warn("v.gd error:", text); return null; }
-  return text;
-}
-
-// ── cleanuri.com helper ───────────────────────────────────────
-async function callCleanuri(longUrl) {
-  const directUrl = "https://cleanuri.com/api/v1/shorten";
-  // cleanuri รับ POST form-data
-  const body = "url=" + encodeURIComponent(longUrl);
-
-  // รอบที่ 1: ลองตรง
   try {
-    const res = await fetch(directUrl, {
-      method: "POST", mode: "cors",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body, signal: AbortSignal.timeout(6000)
-    });
+    const res = await fetch(apiUrl, { method: 'GET' });
     if (res.ok) {
       const data = await res.json();
-      if (data && data.result_url) return data.result_url;
+      if (data && data.shortUrl) return { url: data.shortUrl, service: data.service };
+    } else {
+      const err = await res.json().catch(() => ({}));
+      console.warn('API error:', err);
+      return { error: err.details || [err.error || 'Unknown error'] };
     }
-  } catch (e) { console.warn("cleanuri direct failed:", e.message); }
-
-  // รอบที่ 2: ผ่าน CORS proxy (GET พร้อม query param แทน POST)
-  try {
-    const proxyPost = "https://corsproxy.io/?" + encodeURIComponent(directUrl);
-    const res = await fetch(proxyPost, {
-      method: "POST", mode: "cors",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body, signal: AbortSignal.timeout(8000)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.result_url) return data.result_url;
-    }
-  } catch (e) { console.warn("cleanuri proxy failed:", e.message); }
-
-  return null;
+  } catch (e) {
+    console.error('callShortenAPI failed:', e.message);
+    return { error: [e.message] };
+  }
+  return { error: ['No response from /api/shorten'] };
 }
 
-// ── ฟังก์ชันหลัก ──────────────────────────────────────────────
 async function createAutoShortURL(longUrl) {
-  updateLinkStatus("trying", "กำลังลอง v.gd...");
-
-  const vgdResult = await callVgd(longUrl);
-  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
-
-  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
-
-  const cleanResult = await callCleanuri(longUrl);
-  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
-
-  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
-  return null; // ไม่คืนลิงก์จำลอง
+  updateLinkStatus("trying", "กำลังย่อลิงก์...");
+  const result = await callShortenAPI(longUrl, null);
+  if (result.url) {
+    updateLinkStatus(true, result.service);
+    return result.url;
+  }
+  updateLinkStatus(false, result.error && result.error[0] ? result.error[0].substring(0, 60) : "ไม่สำเร็จ");
+  return null;
 }
 
 async function createReadableShortURL(longUrl) {
-  updateLinkStatus("trying", "กำลังลอง v.gd...");
-  const vgdResult = await callVgd(longUrl);
-  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
-
-  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
-  const cleanResult = await callCleanuri(longUrl);
-  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
-
-  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+  updateLinkStatus("trying", "กำลังย่อลิงก์...");
+  const result = await callShortenAPI(longUrl, null);
+  if (result.url) {
+    updateLinkStatus(true, result.service);
+    return result.url;
+  }
+  updateLinkStatus(false, result.error && result.error[0] ? result.error[0].substring(0, 60) : "ไม่สำเร็จ");
   return null;
 }
 
 async function createCustomShortURL(longUrl, customCode) {
-  updateLinkStatus("trying", "กำลังลอง v.gd (custom alias)...");
-  const vgdResult = await callVgd(longUrl, customCode);
-  if (vgdResult) { updateLinkStatus(true, "v.gd"); return vgdResult; }
-
-  // cleanuri ไม่รองรับ custom alias → ลอง v.gd แบบ random
-  updateLinkStatus("trying", "alias นี้อาจถูกใช้แล้ว ลอง v.gd (random)...");
-  const vgdRandom = await callVgd(longUrl);
-  if (vgdRandom) { updateLinkStatus(true, "v.gd (random)"); return vgdRandom; }
-
-  updateLinkStatus("trying", "กำลังลอง cleanuri.com...");
-  const cleanResult = await callCleanuri(longUrl);
-  if (cleanResult) { updateLinkStatus(true, "cleanuri.com"); return cleanResult; }
-
-  updateLinkStatus(false, "ทุก API ไม่ตอบสนอง");
+  updateLinkStatus("trying", "กำลังย่อลิงก์ (custom alias)...");
+  // ลอง custom alias ก่อน
+  const result = await callShortenAPI(longUrl, customCode);
+  if (result.url) {
+    updateLinkStatus(true, result.service);
+    return result.url;
+  }
+  // ถ้า alias ถูกใช้ไปแล้ว → ลอง random
+  updateLinkStatus("trying", "alias นี้ถูกใช้แล้ว กำลังลอง random...");
+  const fallback = await callShortenAPI(longUrl, null);
+  if (fallback.url) {
+    updateLinkStatus(true, fallback.service + " (random)");
+    return fallback.url;
+  }
+  updateLinkStatus(false, "ไม่สำเร็จ");
   return null;
 }
 
 function updateLinkStatus(isReal, serviceName) {
-  const statusSpan  = document.getElementById("linkStatus");
-  const warningDiv  = document.getElementById("warningMessage");
+  const statusSpan = document.getElementById("linkStatus");
+  const warningDiv = document.getElementById("warningMessage");
   if (!statusSpan) return;
-
   if (isReal === "trying") {
     statusSpan.textContent = "⏳ " + (serviceName || "กำลังลอง...");
     statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-gray-100 text-gray-600";
     warningDiv && warningDiv.classList.add("hidden");
   } else if (isReal === true) {
-    statusSpan.textContent = "✅ ใช้งานได้จริง" + (serviceName ? " (" + serviceName + ")" : "");
+    statusSpan.textContent = "✅ ใช้งานได้จริง (" + (serviceName || "") + ")";
     statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-green-100 text-green-800";
     warningDiv && warningDiv.classList.add("hidden");
   } else {
-    statusSpan.textContent = "❌ " + (serviceName || "ไม่สำเร็จ");
+    statusSpan.textContent = "❌ ไม่สำเร็จ";
     statusSpan.className = "ml-2 px-2 py-1 rounded text-xs bg-red-100 text-red-700";
-    warningDiv && warningDiv.classList.remove("hidden");
+    if (warningDiv) {
+      warningDiv.classList.remove("hidden");
+      warningDiv.innerHTML = "❌ ไม่สามารถย่อลิงก์ได้<br><small style='color:#6b7280'>รายละเอียด: " + (serviceName || "ไม่ทราบสาเหตุ") + "</small>";
+    }
   }
 }
 
