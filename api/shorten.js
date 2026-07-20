@@ -1,4 +1,4 @@
-// api/shorten.js — Vercel Serverless Function
+// api/shorten.js — Vercel Serverless Function — v2.1.1
 // Provider order:
 //   1) Short.io with an OAE-owned domain (optional; set environment variables)
 //   2) is.gd (free, no registration)
@@ -175,6 +175,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
 
   if (req.method === 'OPTIONS') {
     return corsAllowed ? res.status(204).end() : res.status(403).end();
