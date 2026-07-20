@@ -1,5 +1,8 @@
 // api/shorten.js — Vercel Serverless Function
-// Free providers (in failover order): is.gd -> cleanuri.com -> v.gd
+// Provider order:
+//   1) Short.io with an OAE-owned domain (optional; set environment variables)
+//   2) is.gd (free, no registration)
+//   3) v.gd  (free, no registration)
 
 const REQUEST_TIMEOUT_MS = 3000;
 const MAX_URL_LENGTH = 8192;
@@ -90,7 +93,7 @@ async function shortenWithIsGdFamily(service, longUrl, alias) {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      'User-Agent': 'OAE-URL-Shortener/2.0'
+      'User-Agent': 'OAE-URL-Shortener/2.1'
     }
   });
 
@@ -112,15 +115,37 @@ async function shortenWithIsGdFamily(service, longUrl, alias) {
   return validateShortUrl(data.shorturl, service);
 }
 
-async function shortenWithCleanUri(longUrl) {
-  const response = await fetchWithTimeout('https://cleanuri.com/api/v1/shorten', {
+function getShortIoConfig() {
+  const apiKey = String(process.env.SHORTIO_API_KEY || '').trim();
+  const rawDomain = String(process.env.SHORTIO_DOMAIN || '').trim();
+  if (!apiKey || !rawDomain) return null;
+
+  const hostname = new URL(
+    rawDomain.startsWith('http://') || rawDomain.startsWith('https://')
+      ? rawDomain
+      : `https://${rawDomain}`
+  ).hostname;
+
+  return { apiKey, hostname };
+}
+
+async function shortenWithShortIo(longUrl, alias, config) {
+  const payload = {
+    originalURL: longUrl,
+    domain: config.hostname,
+    redirectType: 302
+  };
+  if (alias) payload.path = alias;
+
+  const response = await fetchWithTimeout('https://api.short.io/links', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-      'User-Agent': 'OAE-URL-Shortener/2.0'
+      'Content-Type': 'application/json',
+      'Authorization': config.apiKey,
+      'User-Agent': 'OAE-URL-Shortener/2.1'
     },
-    body: new URLSearchParams({ url: longUrl }).toString()
+    body: JSON.stringify(payload)
   });
 
   const body = await response.text();
@@ -131,11 +156,13 @@ async function shortenWithCleanUri(longUrl) {
     throw new Error(`HTTP ${response.status}: invalid JSON response`);
   }
 
-  if (!response.ok || !data.result_url) {
-    throw new Error(data.error || `HTTP ${response.status}`);
+  const shortUrl = data.secureShortURL || data.shortURL;
+  if (!response.ok || !shortUrl) {
+    const message = data.error || data.message || `HTTP ${response.status}`;
+    throw new Error(typeof message === 'string' ? message : JSON.stringify(message));
   }
 
-  return validateShortUrl(data.result_url, 'cleanuri.com');
+  return validateShortUrl(shortUrl, config.hostname);
 }
 
 function safeErrorMessage(error) {
@@ -177,19 +204,23 @@ export default async function handler(req, res) {
     });
   }
 
-  // cleanuri.com does not support a custom alias. When alias is requested,
-  // try only providers that can preserve it. The frontend may retry without
-  // alias if it wants a random fallback.
-  const providers = alias
-    ? [
-        { name: 'is.gd', run: () => shortenWithIsGdFamily('is.gd', cleanedUrl, alias) },
-        { name: 'v.gd', run: () => shortenWithIsGdFamily('v.gd', cleanedUrl, alias) }
-      ]
-    : [
-        { name: 'is.gd', run: () => shortenWithIsGdFamily('is.gd', cleanedUrl) },
-        { name: 'cleanuri.com', run: () => shortenWithCleanUri(cleanedUrl) },
-        { name: 'v.gd', run: () => shortenWithIsGdFamily('v.gd', cleanedUrl) }
-      ];
+  const providers = [];
+  try {
+    const shortIoConfig = getShortIoConfig();
+    if (shortIoConfig) {
+      providers.push({
+        name: `Short.io (${shortIoConfig.hostname})`,
+        run: () => shortenWithShortIo(cleanedUrl, alias, shortIoConfig)
+      });
+    }
+  } catch (error) {
+    console.error('Invalid SHORTIO_DOMAIN:', safeErrorMessage(error));
+  }
+
+  providers.push(
+    { name: 'is.gd', run: () => shortenWithIsGdFamily('is.gd', cleanedUrl, alias) },
+    { name: 'v.gd', run: () => shortenWithIsGdFamily('v.gd', cleanedUrl, alias) }
+  );
 
   const errors = [];
   for (const provider of providers) {
