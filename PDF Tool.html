@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>Advanced PDF Tools</title>
+  <title>OTS PDF Tools</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
@@ -487,7 +487,7 @@
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-shadow">🔧 Advanced PDF Tools</h1>
+          <h1 class="text-3xl font-bold text-shadow">🔧 OTS PDF Tools</h1>
           <p class="text-blue-100 mt-1">เครื่องมือ PDF </p>
         </div>
         <button onclick="goBack()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all">
@@ -6924,8 +6924,8 @@
         // เพิ่ม metadata ที่บ่งบอกว่ามีการป้องกัน
         newPdf.setTitle('Protected PDF Document');
         newPdf.setSubject('This document is password protected');
-        newPdf.setCreator('Advanced PDF Tools - Protected');
-        newPdf.setProducer('PDF Tools with Security');
+        newPdf.setCreator('OTS PDF Tools - Protected');
+        newPdf.setProducer('OTS PDF Tools');
         newPdf.setCreationDate(new Date());
         newPdf.setModificationDate(new Date());
         
@@ -7049,7 +7049,7 @@
 
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('🚀 Initializing PDF Tools...');
+      console.log('🚀 Initializing OTS PDF Tools...');
       
       // Setup event listeners for all tools
       setupMergeListeners();
@@ -7074,7 +7074,7 @@
         openTool(tool);
       }
       
-      console.log('✅ Advanced PDF Tools initialized successfully');
+      console.log('✅ OTS PDF Tools initialized successfully');
     });
 
     // Make functions globally available for onclick handlers
